@@ -7,7 +7,11 @@ import pytest
 from openpyxl import Workbook
 
 from csv_data_cleaner.domain.errors import InputDataError
-from csv_data_cleaner.infrastructure.input import PandasInputReader
+from csv_data_cleaner.infrastructure.input import DataFrameInputMapper, PandasInputReader
+
+
+def build_reader() -> PandasInputReader:
+    return PandasInputReader(mapper=DataFrameInputMapper())
 
 
 def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
@@ -26,7 +30,7 @@ def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
     worksheet.append(["Grace", None])
     workbook.save(xlsx_path)
 
-    reader = PandasInputReader()
+    reader = build_reader()
 
     assert reader.read(csv_path) == reader.read(xlsx_path)
 
@@ -43,7 +47,7 @@ def test_xlsx_reads_requested_sheet(tmp_path: Path) -> None:
     customers.append(["Ada"])
     workbook.save(path)
 
-    result = PandasInputReader().read(path, sheet="Customers")
+    result = build_reader().read(path, sheet="Customers")
 
     assert result.rows[0].values["name"] == "Ada"
 
@@ -55,4 +59,4 @@ def test_reader_rejects_unreadable_or_unsupported_input(tmp_path: Path, filename
         path.write_text("name\nAda\n", encoding="utf-8")
 
     with pytest.raises(InputDataError):
-        PandasInputReader().read(path)
+        build_reader().read(path)
