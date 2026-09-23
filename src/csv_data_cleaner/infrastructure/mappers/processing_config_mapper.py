@@ -4,6 +4,8 @@ from csv_data_cleaner.domain import (
     DateValidationRule,
     DeduplicationKeep,
     DeduplicationPolicy,
+    FilterOperator,
+    FilterRule,
     NormalizationPolicy,
     OutputFormat,
     ProcessingConfig,
@@ -37,6 +39,15 @@ class ProcessingConfigMapper:
                 date_output_format=data.normalization.date_output_format,
             ),
             deduplication=deduplication,
+            filters=tuple(
+                FilterRule(
+                    column=item.column,
+                    operator=FilterOperator(item.operator),
+                    value=item.value,
+                    include=item.include,
+                )
+                for item in data.filters
+            ),
             sorting=tuple(
                 SortRule(column=item.column, ascending=item.ascending) for item in data.sorting
             ),
