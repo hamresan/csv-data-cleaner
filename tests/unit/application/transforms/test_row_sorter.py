@@ -1,10 +1,10 @@
 """Behavioral tests for ordered row sorting."""
 
 from csv_data_cleaner.application.transforms import RowSorter, SortValueKeyBuilder
-from csv_data_cleaner.domain import DataRow, RowProcessingResult, SortRule
+from csv_data_cleaner.domain import CellValue, DataRow, RowProcessingResult, SortRule
 
 
-def row(number: int, **values: object) -> RowProcessingResult:
+def row(number: int, **values: CellValue) -> RowProcessingResult:
     data = DataRow(number=number, values=values)
     return RowProcessingResult(source_row=data, normalized_row=data, issues=())
 
