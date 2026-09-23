@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from openpyxl import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
 from csv_data_cleaner.domain.errors import InputDataError
 from csv_data_cleaner.infrastructure.input import DataFrameInputMapper, PandasInputReader
@@ -12,6 +13,12 @@ from csv_data_cleaner.infrastructure.input import DataFrameInputMapper, PandasIn
 
 def build_reader() -> PandasInputReader:
     return PandasInputReader(mapper=DataFrameInputMapper())
+
+
+def active_sheet(workbook: Workbook) -> Worksheet:
+    worksheet = workbook.active
+    assert worksheet is not None
+    return worksheet
 
 
 def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
@@ -24,7 +31,7 @@ def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
 
     xlsx_path = tmp_path / "customers.xlsx"
     workbook = Workbook()
-    worksheet = workbook.active
+    worksheet = active_sheet(workbook)
     worksheet.append(["name", "email"])
     worksheet.append(["Ada", "ada@example.com"])
     worksheet.append(["Grace", None])
@@ -38,7 +45,7 @@ def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
 def test_xlsx_reads_requested_sheet(tmp_path: Path) -> None:
     path = tmp_path / "customers.xlsx"
     workbook = Workbook()
-    first = workbook.active
+    first = active_sheet(workbook)
     first.title = "First"
     first.append(["name"])
     first.append(["Wrong"])
