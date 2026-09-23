@@ -1,6 +1,6 @@
 """Behavioral tests for ordered row sorting."""
 
-from csv_data_cleaner.application.transforms import RowSorter
+from csv_data_cleaner.application.transforms import RowSorter, SortValueKeyBuilder
 from csv_data_cleaner.domain import DataRow, RowProcessingResult, SortRule
 
 
@@ -16,7 +16,7 @@ def test_sorter_applies_multiple_rules_in_declared_order() -> None:
         row(4, country="OM", name="A"),
     )
 
-    result = RowSorter().sort(
+    result = RowSorter(SortValueKeyBuilder()).sort(
         rows,
         (
             SortRule("country", ascending=True),
