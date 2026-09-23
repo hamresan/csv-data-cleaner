@@ -4,6 +4,7 @@ import pytest
 
 from csv_data_cleaner.domain.errors import ConfigurationError
 from csv_data_cleaner.infrastructure.validators.config_field_validator import ConfigFieldValidator
+from csv_data_cleaner.infrastructure.types.config_value import ConfigObject
 from csv_data_cleaner.infrastructure.validators.processing_config_validator import (
     ProcessingConfigValidator,
 )
@@ -65,9 +66,7 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
     assert result.normalization.date_output_format == "%Y-%m-%d"
 
 
-@pytest.mark.parametrize(
-    "config",
-    [
+INVALID_CONFIGS: list[ConfigObject] = [
         {"required_columns": "email"},
         {"validation": []},
         {"validation": {"date_formats": []}},
@@ -103,6 +102,6 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
         {"output": {"format": "json"}},
     ],
 )
-def test_validator_rejects_invalid_schema(config: dict[str, object]) -> None:
+def test_validator_rejects_invalid_schema(config: ConfigObject) -> None:
     with pytest.raises(ConfigurationError):
-        build_validator().validate(config)  # type: ignore[arg-type]
+        build_validator().validate(config)
