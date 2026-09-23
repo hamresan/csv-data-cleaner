@@ -8,7 +8,12 @@ import yaml
 
 from csv_data_cleaner.domain import DeduplicationKeep, OutputFormat
 from csv_data_cleaner.domain.errors import ConfigurationError
-from csv_data_cleaner.infrastructure.config import FileConfigLoader
+from csv_data_cleaner.infrastructure.config import (
+    ConfigParserFactory,
+    ConfigValueParser,
+    FileConfigLoader,
+    ProcessingConfigMapper,
+)
 
 CONFIG = {
     "required_columns": ["name", "email"],
@@ -19,6 +24,14 @@ CONFIG = {
 }
 
 
+def build_loader() -> FileConfigLoader:
+    return FileConfigLoader(
+        parser_factory=ConfigParserFactory(),
+        value_parser=ConfigValueParser(),
+        mapper=ProcessingConfigMapper(),
+    )
+
+
 @pytest.mark.parametrize("suffix", [".json", ".yaml"])
 def test_supported_config_formats_map_to_same_domain_config(tmp_path: Path, suffix: str) -> None:
     path = tmp_path / f"rules{suffix}"
@@ -27,7 +40,7 @@ def test_supported_config_formats_map_to_same_domain_config(tmp_path: Path, suff
     else:
         path.write_text(yaml.safe_dump(CONFIG), encoding="utf-8")
 
-    config = FileConfigLoader().load(path)
+    config = build_loader().load(path)
 
     assert config.required_columns == ("name", "email")
     assert config.deduplication is not None
@@ -52,4 +65,4 @@ def test_invalid_configurations_are_rejected(
         path.write_text(content, encoding="utf-8")
 
     with pytest.raises(ConfigurationError):
-        FileConfigLoader().load(path)
+        build_loader().load(path)
