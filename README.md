@@ -76,6 +76,12 @@ deduplication:
     - email
   keep: first
 
+filters:
+  - column: country
+    operator: equals
+    value: OM
+    include: true
+
 sorting:
   - column: name
     ascending: true
@@ -132,6 +138,7 @@ Rules are intentionally configurable, so the same tool can support different dat
 | `normalization.date_output_format` | Canonical date representation; defaults to `%Y-%m-%d` |
 | `deduplication.columns` | One or more columns used to identify duplicates |
 | `deduplication.keep` | Which duplicate to keep: `first` or `last` |
+| `filters` | Ordered inclusion/exclusion filters using `equals` or `not_equals` |
 | `sorting` | Ordered list of output sorting rules |
 | `output.format` | Output format: `csv` or `xlsx` |
 
@@ -144,6 +151,10 @@ Deduplication runs after normalization and validation and compares the normalize
 Missing key values participate in the duplicate key. This means two rows with the same normalized key, including `null` in the same key positions, are duplicates. For example, when `email` is the only duplicate key, two rows whose normalized `email` is `null` belong to the same duplicate group.
 
 Validation status does not exclude a row from duplicate detection. If duplicate rows are also validation-invalid, dropped rows are classified as duplicates and kept separately for duplicate review rather than being counted again among retained invalid rows. Their original source values and validation issues remain available in the processing result.
+
+### Filtering and sorting behavior
+
+The Stage 4 pipeline order is explicit: read -> normalize/validate -> deduplicate -> filter -> sort -> export/report. Filters and sorting operate on normalized retained rows after deduplication. Every filter is applied with AND semantics. A filter compares the configured column with a scalar value using `equals` or `not_equals`; `include: true` keeps matching rows while `include: false` excludes matching rows. Sorting rules are applied in their declared priority order and preserve stable source order for ties. Null values sort after non-null values in ascending order. Referencing a missing filter or sorting column stops processing with a clear input error.
 
 ## Command reference
 
