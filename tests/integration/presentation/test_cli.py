@@ -1,11 +1,11 @@
-"""Integration tests for the installed command-line entry point."""
+"""Integration tests for the command-line entry point."""
 
 import subprocess
 import sys
 
 from click.testing import CliRunner
 
-from csv_data_cleaner.presentation.cli import cli
+from csv_data_cleaner.presentation.cli import cli, main
 
 
 def test_cli_help_succeeds() -> None:
@@ -13,6 +13,15 @@ def test_cli_help_succeeds() -> None:
 
     assert result.exit_code == 0
     assert "Clean, validate, deduplicate" in result.output
+
+
+def test_main_runs_cli_help(monkeypatch: object) -> None:
+    monkeypatch.setattr(sys, "argv", ["csv-data-cleaner", "--help"])
+
+    try:
+        main()
+    except SystemExit as error:
+        assert error.code == 0
 
 
 def test_package_import_succeeds_in_fresh_python_process() -> None:
