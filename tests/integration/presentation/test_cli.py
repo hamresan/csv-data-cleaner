@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from click.testing import CliRunner
+from pytest import MonkeyPatch
 
 from csv_data_cleaner.presentation.cli import cli, main
 
@@ -15,7 +16,7 @@ def test_cli_help_succeeds() -> None:
     assert "Clean, validate, deduplicate" in result.output
 
 
-def test_main_runs_cli_help(monkeypatch: object) -> None:
+def test_main_runs_cli_help(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(sys, "argv", ["csv-data-cleaner", "--help"])
 
     try:
