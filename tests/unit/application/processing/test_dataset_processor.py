@@ -142,3 +142,43 @@ def test_processor_deduplicates_after_normalization_and_validation() -> None:
     assert duplicate.row.source_row.number == 3
     assert duplicate.retained_row_number == 2
     assert duplicate.key == ("ada@example.com",)
+
+
+
+def test_processor_counts_invalid_duplicate_only_as_duplicate_after_deduplication() -> None:
+    input_data = InputData(
+        columns=("name", "email", "created_at"),
+        rows=(
+            DataRow(
+                number=2,
+                values={
+                    "name": "First invalid",
+                    "email": "bad-email",
+                    "created_at": "23/09/2026",
+                },
+            ),
+            DataRow(
+                number=3,
+                values={
+                    "name": "Duplicate invalid",
+                    "email": "bad-email",
+                    "created_at": "23/09/2026",
+                },
+            ),
+        ),
+    )
+
+    result = build_processor().process(
+        input_data,
+        build_config(deduplication=DeduplicationPolicy(columns=("email",))),
+    )
+
+    assert len(result.rows) == 1
+    assert len(result.invalid_rows) == 1
+    assert result.invalid_rows[0].source_row.number == 2
+    assert len(result.duplicate_rows) == 1
+    duplicate = result.duplicate_rows[0]
+    assert duplicate.row.source_row.number == 3
+    assert not duplicate.row.is_valid
+    assert duplicate.retained_row_number == 2
+    assert len(result.invalid_rows) + len(result.duplicate_rows) == 2
