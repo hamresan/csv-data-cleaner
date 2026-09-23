@@ -111,6 +111,7 @@ def test_treats_equal_missing_keys_as_duplicates() -> None:
 
 def test_duplicate_invalid_rows_preserve_validation_state() -> None:
     issue = ValidationIssue(
+        row_number=2,
         column="email",
         code="invalid_email",
         message="Invalid email.",
