@@ -1,0 +1,40 @@
+required_columns:
+  - name
+  - email
+  - signup_date
+  - country
+
+validation:
+  email_columns:
+    - email
+  date_columns:
+    - signup_date
+  date_formats:
+    signup_date:
+      - "%Y-%m-%d"
+      - "%d/%m/%Y"
+
+normalization:
+  trim_whitespace: true
+  empty_strings_as_null: true
+  casefold_columns:
+    - email
+  date_output_format: "%Y-%m-%d"
+
+deduplication:
+  columns:
+    - email
+  keep: first
+
+filters:
+  - column: country
+    operator: equals
+    value: OM
+    include: true
+
+sorting:
+  - column: name
+    ascending: true
+
+output:
+  format: csv
