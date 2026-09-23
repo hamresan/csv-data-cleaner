@@ -35,6 +35,15 @@ class CleanDataUseCase:
         config = self.config_loader.load(request.config_path)
         input_data = self.input_reader.read(request.input_path, sheet=request.sheet)
         processing_result = self.dataset_processor.process(input_data, config)
+
+        if request.dry_run:
+            summary = self.report_calculator.calculate(
+                request.input_path,
+                processing_result,
+                None,
+            )
+            return CleanDataResult(processing_result=processing_result, summary=summary)
+
         output_file = self.exporter.export(processing_result, config, request.output_dir)
         summary = self.report_calculator.calculate(
             request.input_path,
