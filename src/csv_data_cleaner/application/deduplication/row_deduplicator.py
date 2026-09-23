@@ -17,8 +17,7 @@ class RowDeduplicator:
         policy: DeduplicationPolicy,
     ) -> DeduplicationResult:
         keys = tuple(
-            tuple(row.normalized_row.values[column] for column in policy.columns)
-            for row in rows
+            tuple(row.normalized_row.values[column] for column in policy.columns) for row in rows
         )
         retained_index_by_key: dict[DuplicateKey, int] = {}
 
@@ -30,9 +29,7 @@ class RowDeduplicator:
             retained_index_by_key.setdefault(keys[index], index)
 
         retained_indices = set(retained_index_by_key.values())
-        retained_rows = tuple(
-            row for index, row in enumerate(rows) if index in retained_indices
-        )
+        retained_rows = tuple(row for index, row in enumerate(rows) if index in retained_indices)
         duplicate_rows = tuple(
             DuplicateRow(
                 row=row,
