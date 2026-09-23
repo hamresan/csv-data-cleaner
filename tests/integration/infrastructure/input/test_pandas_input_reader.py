@@ -9,11 +9,22 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from csv_data_cleaner.domain.errors import InputDataError
 from csv_data_cleaner.infrastructure.input import PandasInputReader
+from csv_data_cleaner.infrastructure.mappers.cell_value_mapper import CellValueMapper
 from csv_data_cleaner.infrastructure.mappers.data_frame_input_mapper import DataFrameInputMapper
+from csv_data_cleaner.infrastructure.validators.data_frame_header_validator import (
+    DataFrameHeaderValidator,
+)
+
+
+def build_mapper() -> DataFrameInputMapper:
+    return DataFrameInputMapper(
+        header_validator=DataFrameHeaderValidator(),
+        cell_value_mapper=CellValueMapper(),
+    )
 
 
 def build_reader() -> PandasInputReader:
-    return PandasInputReader(mapper=DataFrameInputMapper())
+    return PandasInputReader(mapper=build_mapper())
 
 
 def active_sheet(workbook: Workbook) -> Worksheet:
