@@ -1,4 +1,4 @@
-"""Process canonical input rows through the Stage 4 transformation pipeline."""
+"""Process canonical input rows through the transformation pipeline."""
 
 from csv_data_cleaner.application.deduplication import (
     DeduplicationSchemaValidator,
@@ -69,4 +69,5 @@ class DatasetProcessor:
             rows=transformed_rows,
             duplicate_rows=duplicate_rows,
             filtered_rows=filtered_rows,
+            columns=input_data.columns,
         )

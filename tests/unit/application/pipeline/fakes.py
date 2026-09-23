@@ -2,7 +2,13 @@
 
 from pathlib import Path
 
-from csv_data_cleaner.application.ports import ConfigLoader, Exporter, InputReader, ReportCalculator
+from csv_data_cleaner.application.ports import (
+    ConfigLoader,
+    Exporter,
+    InputReader,
+    ReportCalculator,
+    ReportWriter,
+)
 from csv_data_cleaner.domain import (
     DatasetProcessingResult,
     InputData,
@@ -32,7 +38,8 @@ class FakeInputReader(InputReader):
 
 
 class FakeExporter(Exporter):
-    def __init__(self) -> None:
+    def __init__(self, output_file: Path) -> None:
+        self.output_file = output_file
         self.calls: list[tuple[DatasetProcessingResult, ProcessingConfig, Path]] = []
 
     def export(
@@ -40,19 +47,30 @@ class FakeExporter(Exporter):
         result: DatasetProcessingResult,
         config: ProcessingConfig,
         output_dir: Path,
-    ) -> None:
+    ) -> Path:
         self.calls.append((result, config, output_dir))
+        return self.output_file
 
 
 class FakeReportCalculator(ReportCalculator):
     def __init__(self, summary: ProcessingSummary) -> None:
         self.summary = summary
-        self.calls: list[tuple[Path, DatasetProcessingResult]] = []
+        self.calls: list[tuple[Path, DatasetProcessingResult, Path]] = []
 
     def calculate(
         self,
         input_path: Path,
         result: DatasetProcessingResult,
+        output_file: Path,
     ) -> ProcessingSummary:
-        self.calls.append((input_path, result))
+        self.calls.append((input_path, result, output_file))
         return self.summary
+
+
+class FakeReportWriter(ReportWriter):
+    def __init__(self) -> None:
+        self.calls: list[tuple[ProcessingSummary, Path]] = []
+
+    def write(self, summary: ProcessingSummary, output_dir: Path) -> Path:
+        self.calls.append((summary, output_dir))
+        return output_dir / "report.json"

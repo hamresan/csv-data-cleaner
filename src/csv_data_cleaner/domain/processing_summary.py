@@ -12,4 +12,5 @@ class ProcessingSummary:
     valid_records: int
     invalid_records: int
     duplicate_records: int
-    output_file: str | None
+    exported_records: int
+    output_file: str

@@ -49,6 +49,7 @@ from .fakes import (
     FakeExporter,
     FakeInputReader,
     FakeReportCalculator,
+    FakeReportWriter,
 )
 
 
@@ -95,17 +96,28 @@ def test_use_case_coordinates_pipeline_boundaries() -> None:
             DataRow(4, {"name": "A", "country": "OM"}),
         ),
     )
-    summary = ProcessingSummary("input.csv", 3, 2, 0, 0, None)
+    output_file = Path("output/cleaned.csv")
+    summary = ProcessingSummary(
+        input_file="input.csv",
+        processed_records=3,
+        valid_records=3,
+        invalid_records=0,
+        duplicate_records=0,
+        exported_records=2,
+        output_file=str(output_file),
+    )
     config_loader = FakeConfigLoader(config)
     input_reader = FakeInputReader(data)
-    exporter = FakeExporter()
+    exporter = FakeExporter(output_file)
     report_calculator = FakeReportCalculator(summary)
+    report_writer = FakeReportWriter()
     use_case = CleanDataUseCase(
         config_loader,
         input_reader,
         processor(),
         exporter,
         report_calculator,
+        report_writer,
     )
     request = CleanDataRequest(
         Path("input.csv"),
@@ -118,8 +130,10 @@ def test_use_case_coordinates_pipeline_boundaries() -> None:
 
     assert tuple(row.source_row.number for row in result.processing_result.rows) == (4, 2)
     assert tuple(row.source_row.number for row in result.processing_result.filtered_rows) == (3,)
+    assert result.processing_result.columns == ("name", "country")
     assert config_loader.calls == [Path("rules.yaml")]
     assert input_reader.calls == [(Path("input.csv"), "Customers")]
     assert exporter.calls == [(result.processing_result, config, Path("output"))]
-    assert report_calculator.calls == [(Path("input.csv"), result.processing_result)]
+    assert report_calculator.calls == [(Path("input.csv"), result.processing_result, output_file)]
+    assert report_writer.calls == [(summary, Path("output"))]
     assert result.summary == summary
