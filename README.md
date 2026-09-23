@@ -154,7 +154,11 @@ Validation status does not exclude a row from duplicate detection. If duplicate 
 
 ### Filtering and sorting behavior
 
-The Stage 4 pipeline order is explicit: read -> normalize/validate -> deduplicate -> filter -> sort -> export/report. Filters and sorting operate on normalized retained rows after deduplication. Every filter is applied with AND semantics. A filter compares the configured column with a scalar value using `equals` or `not_equals`; `include: true` keeps matching rows while `include: false` excludes matching rows. Sorting rules are applied in their declared priority order and preserve stable source order for ties. Null values sort after non-null values in ascending order. Referencing a missing filter or sorting column stops processing with a clear input error.\n\n### Export and reporting behavior\n\nStage 5 writes `cleaned.csv` or `cleaned.xlsx` according to `output.format`, plus `invalid_rows.csv`, `duplicate_rows.csv`, and `report.json`. Cleaned output uses normalized valid rows. Review exports preserve original source values. The report is calculated from the pipeline result and includes processed, valid, invalid, duplicate, and exported record counts. Existing output directories are rejected by default so files are never silently overwritten.
+The Stage 4 pipeline order is explicit: read -> normalize/validate -> deduplicate -> filter -> sort -> export/report. Filters and sorting operate on normalized retained rows after deduplication. Every filter is applied with AND semantics. A filter compares the configured column with a scalar value using `equals` or `not_equals`; `include: true` keeps matching rows while `include: false` excludes matching rows. Sorting rules are applied in their declared priority order and preserve stable source order for ties. Null values sort after non-null values in ascending order. Referencing a missing filter or sorting column stops processing with a clear input error.
+
+### Export and reporting behavior
+
+Stage 5 writes `cleaned.csv` or `cleaned.xlsx` according to `output.format`, plus `invalid_rows.csv`, `duplicate_rows.csv`, and `report.json`. Cleaned output uses normalized valid rows. Review exports preserve original source values. The report is calculated from the pipeline result and includes processed, valid, invalid, duplicate, and exported record counts. Existing output directories are rejected by default so files are never silently overwritten.
 
 ## Command reference
 
