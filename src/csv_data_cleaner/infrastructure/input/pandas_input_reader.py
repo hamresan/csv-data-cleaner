@@ -1,10 +1,8 @@
 """Pandas-backed CSV and XLSX input adapter."""
 
 from pathlib import Path
-from typing import cast
 
 import pandas as pd
-from pandas import DataFrame
 
 from csv_data_cleaner.application.ports import InputReader
 from csv_data_cleaner.domain import InputData
@@ -27,7 +25,7 @@ class PandasInputReader(InputReader):
             if suffix == ".csv":
                 frame = pd.read_csv(path, dtype=object)
             elif suffix == ".xlsx":
-                frame = cast(DataFrame, pd.read_excel(path, sheet_name=sheet or 0, dtype=object))
+                frame = pd.read_excel(path, sheet_name=sheet or 0, dtype=object)
             else:
                 raise InputDataError(f"Unsupported input format: {suffix}")
         except (OSError, ValueError, pd.errors.ParserError) as error:
