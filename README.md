@@ -2,7 +2,7 @@
 
 A configurable command-line tool for cleaning, validating, deduplicating, and reporting on CSV and Excel data.
 
-> **Status:** Under active development. This README defines the planned public interface for the first release. The commands below will work once version `0.1.0` is implemented.
+> **Status:** Under active development. This README defines the planned public interface for the first release. The project foundation and CLI entry point are implemented. Feature commands remain under active development until version `0.1.0` is complete.
 
 ## Why this project?
 
@@ -142,17 +142,14 @@ csv-data-cleaner clean
 
 ```bash
 uv sync --all-groups
-uv run ruff check .
-uv run ruff format --check .
-uv run pyright
-uv run pytest
+make check
 ```
 
 The project will use Python 3.12, `pandas`, and `openpyxl` for tabular and Excel handling. Its implementation will keep parsing, validation, deduplication, export, and reporting as separate testable components.
 
 ## Roadmap
 
-- [ ] Project scaffolding and CLI entry point
+- [x] Project scaffolding and CLI entry point
 - [ ] CSV and XLSX readers
 - [ ] Configurable validation and deduplication rules
 - [ ] CSV/XLSX exports and JSON report
