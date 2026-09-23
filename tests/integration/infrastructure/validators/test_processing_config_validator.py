@@ -67,39 +67,39 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
 
 
 INVALID_CONFIGS: list[ConfigObject] = [
-        {"required_columns": "email"},
-        {"validation": []},
-        {"validation": {"date_formats": []}},
-        {
-            "validation": {
-                "date_columns": ["created_at"],
-                "date_formats": {"created_at": []},
-            }
-        },
-        {
-            "validation": {
-                "date_columns": ["created_at"],
-                "date_formats": {"other_date": ["%Y-%m-%d"]},
-            }
-        },
-        {"normalization": []},
-        {"normalization": {"trim_whitespace": "yes"}},
-        {"normalization": {"empty_strings_as_null": "yes"}},
-        {"normalization": {"casefold_columns": "email"}},
-        {"normalization": {"casefold_columns": [""]}},
-        {"normalization": {"date_output_format": ""}},
-        {"deduplication": {"columns": "email"}},
-        {"deduplication": {"columns": []}},
-        {"deduplication": {"keep": "middle"}},
-        {"filters": ["email"]},
-        {"filters": [{"column": "", "value": "x"}]},
-        {"filters": [{"column": "email", "operator": "contains", "value": "x"}]},
-        {"filters": [{"column": "email", "value": [], "include": True}]},
-        {"filters": [{"column": "email", "value": "x", "include": "yes"}]},
-        {"sorting": ["email"]},
-        {"sorting": [{"column": ""}]},
-        {"sorting": [{"column": "email", "ascending": "yes"}]},
-        {"output": {"format": "json"}},
+    {"required_columns": "email"},
+    {"validation": []},
+    {"validation": {"date_formats": []}},
+    {
+        "validation": {
+            "date_columns": ["created_at"],
+            "date_formats": {"created_at": []},
+        }
+    },
+    {
+        "validation": {
+            "date_columns": ["created_at"],
+            "date_formats": {"other_date": ["%Y-%m-%d"]},
+        }
+    },
+    {"normalization": []},
+    {"normalization": {"trim_whitespace": "yes"}},
+    {"normalization": {"empty_strings_as_null": "yes"}},
+    {"normalization": {"casefold_columns": "email"}},
+    {"normalization": {"casefold_columns": [""]}},
+    {"normalization": {"date_output_format": ""}},
+    {"deduplication": {"columns": "email"}},
+    {"deduplication": {"columns": []}},
+    {"deduplication": {"keep": "middle"}},
+    {"filters": ["email"]},
+    {"filters": [{"column": "", "value": "x"}]},
+    {"filters": [{"column": "email", "operator": "contains", "value": "x"}]},
+    {"filters": [{"column": "email", "value": [], "include": True}]},
+    {"filters": [{"column": "email", "value": "x", "include": "yes"}]},
+    {"sorting": ["email"]},
+    {"sorting": [{"column": ""}]},
+    {"sorting": [{"column": "email", "ascending": "yes"}]},
+    {"output": {"format": "json"}},
 ]
 
 

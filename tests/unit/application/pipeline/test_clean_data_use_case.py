@@ -8,6 +8,7 @@ from tests.unit.application.pipeline.fakes import (
     FakeInputReader,
     FakeReportCalculator,
 )
+from tests.unit.application.validation.fakes import FakeEmailSyntaxChecker
 
 from csv_data_cleaner.application.dates import DateParser
 from csv_data_cleaner.application.deduplication import (
@@ -49,7 +50,6 @@ from csv_data_cleaner.domain import (
     ProcessingSummary,
     SortRule,
 )
-from tests.unit.application.validation.fakes import FakeEmailSyntaxChecker
 
 
 def processor() -> DatasetProcessor:

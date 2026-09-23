@@ -1,7 +1,13 @@
 """Behavioral tests for row filtering."""
 
 from csv_data_cleaner.application.transforms import FilterRuleEvaluator, RowFilter
-from csv_data_cleaner.domain import CellValue, DataRow, FilterOperator, FilterRule, RowProcessingResult
+from csv_data_cleaner.domain import (
+    CellValue,
+    DataRow,
+    FilterOperator,
+    FilterRule,
+    RowProcessingResult,
+)
 
 
 def row(number: int, **values: CellValue) -> RowProcessingResult:

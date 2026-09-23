@@ -21,8 +21,8 @@ from csv_data_cleaner.application.transforms import (
     FilterSortProcessor,
     RowFilter,
     RowSorter,
-    SortValueKeyBuilder,
     SortSchemaValidator,
+    SortValueKeyBuilder,
 )
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
@@ -62,7 +62,9 @@ def build_processor() -> DatasetProcessor:
         ),
         row_deduplicator=RowDeduplicator(),
         deduplication_schema_validator=DeduplicationSchemaValidator(),
-        filter_sort_processor=FilterSortProcessor(RowFilter(FilterRuleEvaluator()), RowSorter(SortValueKeyBuilder())),
+        filter_sort_processor=FilterSortProcessor(
+            RowFilter(FilterRuleEvaluator()), RowSorter(SortValueKeyBuilder())
+        ),
         filter_schema_validator=FilterSchemaValidator(),
         sort_schema_validator=SortSchemaValidator(),
     )
@@ -198,4 +200,3 @@ def test_processor_counts_invalid_duplicate_only_as_duplicate_after_deduplicatio
     assert not duplicate.row.is_valid
     assert duplicate.retained_row_number == 2
     assert len(result.invalid_rows) + len(result.duplicate_rows) == 2
-
