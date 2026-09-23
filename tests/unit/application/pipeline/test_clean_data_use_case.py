@@ -24,10 +24,12 @@ from csv_data_cleaner.application.normalization import (
 from csv_data_cleaner.application.pipeline import CleanDataRequest, CleanDataUseCase
 from csv_data_cleaner.application.processing import DatasetProcessor, RowProcessor
 from csv_data_cleaner.application.transforms import (
+    FilterRuleEvaluator,
     FilterSchemaValidator,
     FilterSortProcessor,
     RowFilter,
     RowSorter,
+    SortValueKeyBuilder,
     SortSchemaValidator,
 )
 from csv_data_cleaner.application.validation import (
@@ -65,7 +67,7 @@ def processor() -> DatasetProcessor:
         ),
         row_deduplicator=RowDeduplicator(),
         deduplication_schema_validator=DeduplicationSchemaValidator(),
-        filter_sort_processor=FilterSortProcessor(RowFilter(), RowSorter()),
+        filter_sort_processor=FilterSortProcessor(RowFilter(FilterRuleEvaluator()), RowSorter(SortValueKeyBuilder())),
         filter_schema_validator=FilterSchemaValidator(),
         sort_schema_validator=SortSchemaValidator(),
     )
