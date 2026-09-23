@@ -8,7 +8,10 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from csv_data_cleaner.application.contracts import EmailSyntaxChecker
 from csv_data_cleaner.application.dates import DateParser
-from csv_data_cleaner.application.deduplication import (\n    DeduplicationSchemaValidator,\n    RowDeduplicator,\n)
+from csv_data_cleaner.application.deduplication import (
+    DeduplicationSchemaValidator,
+    RowDeduplicator,
+)
 from csv_data_cleaner.application.mappers import RowResultMapper
 from csv_data_cleaner.application.normalization import (
     DateRowNormalizer,
@@ -101,6 +104,7 @@ def build_processor() -> DatasetProcessor:
             result_mapper=RowResultMapper(),
         ),
         row_deduplicator=RowDeduplicator(),
+        deduplication_schema_validator=DeduplicationSchemaValidator(),
     )
 
 
