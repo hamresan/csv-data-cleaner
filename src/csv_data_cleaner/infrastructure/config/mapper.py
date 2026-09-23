@@ -32,7 +32,9 @@ class ProcessingConfigMapper:
             email_columns=self.strings(
                 validation.get("email_columns", []), "validation.email_columns"
             ),
-            date_columns=self.strings(validation.get("date_columns", []), "validation.date_columns"),
+            date_columns=self.strings(
+                validation.get("date_columns", []), "validation.date_columns"
+            ),
             deduplication=policy,
             sorting=tuple(
                 SortRule(

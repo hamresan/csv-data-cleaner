@@ -57,9 +57,7 @@ def test_supported_config_formats_map_to_same_domain_config(tmp_path: Path, suff
         ("broken.json", "{"),
     ],
 )
-def test_invalid_configurations_are_rejected(
-    tmp_path: Path, filename: str, content: str
-) -> None:
+def test_invalid_configurations_are_rejected(tmp_path: Path, filename: str, content: str) -> None:
     path = tmp_path / filename
     if filename != "missing.toml":
         path.write_text(content, encoding="utf-8")
