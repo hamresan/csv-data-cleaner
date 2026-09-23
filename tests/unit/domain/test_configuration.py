@@ -4,6 +4,8 @@ from csv_data_cleaner.domain import (
     DateValidationRule,
     DeduplicationKeep,
     DeduplicationPolicy,
+    FilterOperator,
+    FilterRule,
     NormalizationPolicy,
     OutputFormat,
     ProcessingConfig,
@@ -28,6 +30,7 @@ def test_processing_config_preserves_domain_values() -> None:
             date_output_format="%Y-%m-%d",
         ),
         deduplication=DeduplicationPolicy(("email",), DeduplicationKeep.LAST),
+        filters=(FilterRule("email", FilterOperator.NOT_EQUALS, None),),
         sorting=(SortRule("email", ascending=False),),
         output_format=OutputFormat.CSV,
     )
