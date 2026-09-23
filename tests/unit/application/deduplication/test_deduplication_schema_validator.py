@@ -23,7 +23,7 @@ def test_rejects_missing_deduplication_columns() -> None:
 
     with pytest.raises(
         InputDataError,
-        match="^Missing deduplication columns: customer_id, tenant_id$",
+        match=r"^Missing deduplication columns: customer_id, tenant_id$",
     ):
         validator.validate(
             input_data,
