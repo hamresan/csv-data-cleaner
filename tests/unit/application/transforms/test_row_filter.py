@@ -40,3 +40,16 @@ def test_filter_supports_empty_result() -> None:
 
     assert retained == ()
     assert filtered == rows
+
+
+def test_filter_compares_numeric_values_without_string_coercion() -> None:
+    rows = (
+        row(2, score=10),
+        row(3, score=20),
+    )
+    rules = (FilterRule("score", FilterOperator.EQUALS, 10),)
+
+    retained, filtered = RowFilter(FilterRuleEvaluator()).apply(rows, rules)
+
+    assert tuple(item.source_row.number for item in retained) == (2,)
+    assert tuple(item.source_row.number for item in filtered) == (3,)
