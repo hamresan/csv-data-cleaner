@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+from csv_data_cleaner.domain.input_data import CellValue
+
 
 @dataclass(frozen=True, slots=True)
 class DeduplicationConfigData:
@@ -9,6 +11,16 @@ class DeduplicationConfigData:
 
     columns: tuple[str, ...]
     keep: str
+
+
+@dataclass(frozen=True, slots=True)
+class FilterConfigData:
+    """Validated filtering configuration."""
+
+    column: str
+    operator: str
+    value: CellValue
+    include: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,5 +58,6 @@ class ProcessingConfigData:
     date_rules: tuple[DateValidationConfigData, ...]
     normalization: NormalizationConfigData
     deduplication: DeduplicationConfigData | None
+    filters: tuple[FilterConfigData, ...]
     sorting: tuple[SortConfigData, ...]
     output_format: str
