@@ -88,6 +88,7 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
         {"normalization": {"casefold_columns": [""]}},
         {"normalization": {"date_output_format": ""}},
         {"deduplication": {"columns": "email"}},
+        {"deduplication": {"columns": []}},
         {"deduplication": {"keep": "middle"}},
         {"sorting": ["email"]},
         {"sorting": [{"column": ""}]},
