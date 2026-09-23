@@ -144,7 +144,6 @@ def test_processor_deduplicates_after_normalization_and_validation() -> None:
     assert duplicate.key == ("ada@example.com",)
 
 
-
 def test_processor_counts_invalid_duplicate_only_as_duplicate_after_deduplication() -> None:
     input_data = InputData(
         columns=("name", "email", "created_at"),
