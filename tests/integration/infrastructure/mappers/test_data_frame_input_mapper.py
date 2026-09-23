@@ -19,7 +19,7 @@ def build_mapper() -> DataFrameInputMapper:
 
 
 def test_mapper_converts_dataframe_to_canonical_input_data() -> None:
-    frame = pd.DataFrame([{"name": "Ada", "email": "ada@example.com"}, {"name": "Grace"}])
+    frame = pd.DataFrame([["name", "email"], ["Ada", "ada@example.com"], ["Grace", None]])
 
     result = build_mapper().map(frame)
 
@@ -31,7 +31,7 @@ def test_mapper_converts_dataframe_to_canonical_input_data() -> None:
 
 
 def test_mapper_rejects_empty_headers() -> None:
-    frame = pd.DataFrame([["Ada"]], columns=[""])
+    frame = pd.DataFrame([[""], ["Ada"]])
 
     with pytest.raises(InputDataError):
         build_mapper().map(frame)
