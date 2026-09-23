@@ -14,9 +14,7 @@ class DataFrameHeaderValidator:
 
         headers = tuple(frame.iloc[0].tolist())
         if any(
-            value is None
-            or (isinstance(value, float) and value != value)
-            or not str(value).strip()
+            value is None or (isinstance(value, float) and value != value) or not str(value).strip()
             for value in headers
         ):
             raise InputDataError("Input must contain non-empty column headers.")

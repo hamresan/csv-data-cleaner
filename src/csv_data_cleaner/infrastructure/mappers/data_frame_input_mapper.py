@@ -30,8 +30,6 @@ class DataFrameInputMapper:
                     for column, value in zip(columns, row, strict=True)
                 },
             )
-            for index, row in enumerate(
-                frame.iloc[1:].itertuples(index=False, name=None)
-            )
+            for index, row in enumerate(frame.iloc[1:].itertuples(index=False, name=None))
         )
         return InputData(columns=columns, rows=rows)
