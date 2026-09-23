@@ -30,7 +30,7 @@ def test_filter_supports_empty_result() -> None:
     rows = (row(2, country="OM"),)
     rules = (FilterRule("country", FilterOperator.EQUALS, "US"),)
 
-    retained, filtered = RowFilter().apply(rows, rules)
+    retained, filtered = RowFilter(FilterRuleEvaluator()).apply(rows, rules)
 
     assert retained == ()
     assert filtered == rows
