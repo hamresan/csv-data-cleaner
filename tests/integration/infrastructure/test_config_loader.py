@@ -8,12 +8,10 @@ import yaml
 
 from csv_data_cleaner.domain import DeduplicationKeep, OutputFormat
 from csv_data_cleaner.domain.errors import ConfigurationError
-from csv_data_cleaner.infrastructure.config import (
-    ConfigParserFactory,
-    ConfigValueParser,
-    FileConfigLoader,
-    ProcessingConfigMapper,
-)
+from csv_data_cleaner.infrastructure.config import FileConfigLoader
+from csv_data_cleaner.infrastructure.factories.config_parser_factory import ConfigParserFactory
+from csv_data_cleaner.infrastructure.mappers.processing_config_mapper import ProcessingConfigMapper
+from csv_data_cleaner.infrastructure.validators.config_value_validator import ConfigValueValidator
 
 CONFIG = {
     "required_columns": ["name", "email"],
@@ -27,7 +25,7 @@ CONFIG = {
 def build_loader() -> FileConfigLoader:
     return FileConfigLoader(
         parser_factory=ConfigParserFactory(),
-        value_parser=ConfigValueParser(),
+        value_validator=ConfigValueValidator(),
         mapper=ProcessingConfigMapper(),
     )
 
