@@ -3,26 +3,30 @@
 from pandas import DataFrame
 
 from csv_data_cleaner.domain import DataRow, InputData
-from csv_data_cleaner.domain.errors import InputDataError
+from csv_data_cleaner.infrastructure.mappers.cell_value_mapper import CellValueMapper
+from csv_data_cleaner.infrastructure.validators.data_frame_header_validator import (
+    DataFrameHeaderValidator,
+)
 
 
 class DataFrameInputMapper:
     """Convert a raw pandas DataFrame to the canonical domain representation."""
 
+    def __init__(
+        self,
+        header_validator: DataFrameHeaderValidator,
+        cell_value_mapper: CellValueMapper,
+    ) -> None:
+        self.header_validator = header_validator
+        self.cell_value_mapper = cell_value_mapper
+
     def map(self, frame: DataFrame) -> InputData:
-        if frame.empty:
-            raise InputDataError("Input must contain a header row.")
-
-        raw_headers = tuple(frame.iloc[0].tolist())
-        if any(self._is_missing(value) or not str(value).strip() for value in raw_headers):
-            raise InputDataError("Input must contain non-empty column headers.")
-
-        columns = tuple(str(value) for value in raw_headers)
+        columns = self.header_validator.validate(frame)
         rows = tuple(
             DataRow(
                 number=index + 2,
                 values={
-                    column: self.cell_value(value)
+                    column: self.cell_value_mapper.map(value)
                     for column, value in zip(columns, row, strict=True)
                 },
             )
@@ -31,13 +35,3 @@ class DataFrameInputMapper:
             )
         )
         return InputData(columns=columns, rows=rows)
-
-    def cell_value(self, value: object) -> str | int | float | bool | None:
-        if self._is_missing(value):
-            return None
-        if isinstance(value, str | int | float | bool):
-            return value
-        return str(value)
-
-    def _is_missing(self, value: object) -> bool:
-        return value is None or (isinstance(value, float) and value != value)
