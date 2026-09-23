@@ -6,7 +6,6 @@ from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from csv_data_cleaner.application.contracts import EmailSyntaxChecker
 from csv_data_cleaner.application.dates import DateParser
 from csv_data_cleaner.application.deduplication import (
     DeduplicationSchemaValidator,
@@ -34,18 +33,12 @@ from csv_data_cleaner.domain import (
     ProcessingConfig,
 )
 from csv_data_cleaner.infrastructure.input import PandasInputReader
+from csv_data_cleaner.infrastructure.validation import EmailValidatorSyntaxChecker
 from csv_data_cleaner.infrastructure.mappers.cell_value_mapper import CellValueMapper
 from csv_data_cleaner.infrastructure.mappers.data_frame_input_mapper import DataFrameInputMapper
 from csv_data_cleaner.infrastructure.validators.data_frame_header_validator import (
     DataFrameHeaderValidator,
 )
-
-
-class AcceptAllEmailSyntaxChecker(EmailSyntaxChecker):
-    """Accept email syntax because this test does not exercise email validation."""
-
-    def is_valid(self, value: str) -> bool:
-        return True
 
 
 def active_sheet(workbook: Workbook) -> Worksheet:
@@ -98,7 +91,7 @@ def build_processor() -> DatasetProcessor:
             ),
             validator=RowValidator(
                 required_validator=RequiredValueValidator(),
-                email_validator=EmailValueValidator(syntax_checker=AcceptAllEmailSyntaxChecker()),
+                email_validator=EmailValueValidator(syntax_checker=EmailValidatorSyntaxChecker()),
                 date_validator=DateValueValidator(date_parser=date_parser),
             ),
             result_mapper=RowResultMapper(),
