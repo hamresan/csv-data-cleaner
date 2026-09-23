@@ -12,6 +12,9 @@ from csv_data_cleaner.infrastructure.config import FileConfigLoader
 from csv_data_cleaner.infrastructure.factories.config_parser_factory import ConfigParserFactory
 from csv_data_cleaner.infrastructure.mappers.processing_config_mapper import ProcessingConfigMapper
 from csv_data_cleaner.infrastructure.validators.config_value_validator import ConfigValueValidator
+from csv_data_cleaner.infrastructure.validators.processing_config_validator import (
+    ProcessingConfigValidator,
+)
 
 CONFIG = {
     "required_columns": ["name", "email"],
@@ -26,6 +29,7 @@ def build_loader() -> FileConfigLoader:
     return FileConfigLoader(
         parser_factory=ConfigParserFactory(),
         value_validator=ConfigValueValidator(),
+        config_validator=ProcessingConfigValidator(),
         mapper=ProcessingConfigMapper(),
     )
 
