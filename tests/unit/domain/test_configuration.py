@@ -24,6 +24,7 @@ def test_processing_config_preserves_domain_values() -> None:
         normalization=NormalizationPolicy(
             trim_whitespace=True,
             empty_strings_as_null=True,
+            casefold_columns=("email",),
             date_output_format="%Y-%m-%d",
         ),
         deduplication=DeduplicationPolicy(("email",), DeduplicationKeep.LAST),
@@ -33,6 +34,7 @@ def test_processing_config_preserves_domain_values() -> None:
 
     assert config.date_columns == ("signup_date",)
     assert config.date_rules[0].formats == ("%Y-%m-%d", "%d/%m/%Y")
+    assert config.normalization.casefold_columns == ("email",)
     assert config.normalization.date_output_format == "%Y-%m-%d"
     assert config.deduplication == DeduplicationPolicy(("email",), DeduplicationKeep.LAST)
     assert config.sorting == (SortRule("email", ascending=False),)

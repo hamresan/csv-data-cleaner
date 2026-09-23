@@ -87,6 +87,10 @@ class ProcessingConfigValidator:
                     normalization.get("empty_strings_as_null", True),
                     "normalization.empty_strings_as_null",
                 ),
+                casefold_columns=fields.strings(
+                    normalization.get("casefold_columns", []),
+                    "normalization.casefold_columns",
+                ),
                 date_output_format=fields.required_string(
                     normalization.get("date_output_format", "%Y-%m-%d"),
                     "normalization.date_output_format",

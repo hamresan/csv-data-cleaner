@@ -33,6 +33,7 @@ class NormalizationConfigData:
 
     trim_whitespace: bool
     empty_strings_as_null: bool
+    casefold_columns: tuple[str, ...]
     date_output_format: str
 
 
