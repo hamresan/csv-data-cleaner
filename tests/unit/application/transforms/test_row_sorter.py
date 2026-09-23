@@ -34,6 +34,6 @@ def test_sorter_preserves_tie_order_and_handles_null() -> None:
         row(4, score=10),
     )
 
-    result = RowSorter().sort(rows, (SortRule("score"),))
+    result = RowSorter(SortValueKeyBuilder()).sort(rows, (SortRule("score"),))
 
     assert tuple(item.source_row.number for item in result) == (3, 4, 2)
