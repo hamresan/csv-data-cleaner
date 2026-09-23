@@ -50,3 +50,11 @@ include = ["src", "tests"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+[tool.coverage.run]
+branch = true
+source = ["csv_data_cleaner"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
