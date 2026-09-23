@@ -1,22 +1,30 @@
 """Integration tests for real CSV/XLSX input files."""
 
+import csv
 from pathlib import Path
 
-import pandas as pd
 import pytest
+from openpyxl import Workbook
 
 from csv_data_cleaner.domain.errors import InputDataError
 from csv_data_cleaner.infrastructure.input import PandasInputReader
 
 
 def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
-    frame = pd.DataFrame(
-        [{"name": "Ada", "email": "ada@example.com"}, {"name": "Grace", "email": None}]
-    )
     csv_path = tmp_path / "customers.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["name", "email"])
+        writer.writerow(["Ada", "ada@example.com"])
+        writer.writerow(["Grace", ""])
+
     xlsx_path = tmp_path / "customers.xlsx"
-    frame.to_csv(csv_path, index=False)
-    frame.to_excel(xlsx_path, index=False)
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.append(["name", "email"])
+    worksheet.append(["Ada", "ada@example.com"])
+    worksheet.append(["Grace", None])
+    workbook.save(xlsx_path)
 
     reader = PandasInputReader()
 
@@ -25,9 +33,15 @@ def test_csv_and_xlsx_produce_same_canonical_rows(tmp_path: Path) -> None:
 
 def test_xlsx_reads_requested_sheet(tmp_path: Path) -> None:
     path = tmp_path / "customers.xlsx"
-    with pd.ExcelWriter(path) as writer:
-        pd.DataFrame([{"name": "Wrong"}]).to_excel(writer, sheet_name="First", index=False)
-        pd.DataFrame([{"name": "Ada"}]).to_excel(writer, sheet_name="Customers", index=False)
+    workbook = Workbook()
+    first = workbook.active
+    first.title = "First"
+    first.append(["name"])
+    first.append(["Wrong"])
+    customers = workbook.create_sheet("Customers")
+    customers.append(["name"])
+    customers.append(["Ada"])
+    workbook.save(path)
 
     result = PandasInputReader().read(path, sheet="Customers")
 
