@@ -1,5 +1,7 @@
 """Validate and normalize physical DataFrame headers."""
 
+from collections import Counter
+
 from pandas import DataFrame
 
 from csv_data_cleaner.domain.errors import InputDataError
@@ -19,4 +21,12 @@ class DataFrameHeaderValidator:
         ):
             raise InputDataError("Input must contain non-empty column headers.")
 
-        return tuple(str(value) for value in headers)
+        columns = tuple(str(value) for value in headers)
+        duplicates = tuple(
+            column for column, count in Counter(columns).items() if count > 1
+        )
+        if duplicates:
+            names = ", ".join(duplicates)
+            raise InputDataError(f"Input contains duplicate column headers: {names}")
+
+        return columns
