@@ -1,0 +1,9 @@
+{
+  "input_file": "customers.csv",
+  "processed_records": 5,
+  "valid_records": 3,
+  "invalid_records": 1,
+  "duplicate_records": 1,
+  "exported_records": 2,
+  "output_file": "output/cleaned.csv"
+}
