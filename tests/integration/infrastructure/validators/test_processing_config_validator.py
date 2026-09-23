@@ -31,6 +31,7 @@ def test_validator_builds_typed_configuration_data() -> None:
                 "date_output_format": "%Y-%m-%d",
             },
             "deduplication": {"columns": ["email"], "keep": "last"},
+            "filters": [{"column": "email", "operator": "not_equals", "value": None}],
             "sorting": [{"column": "email", "ascending": False}],
             "output": {"format": "xlsx"},
         }
@@ -45,6 +46,7 @@ def test_validator_builds_typed_configuration_data() -> None:
     assert result.normalization.date_output_format == "%Y-%m-%d"
     assert result.deduplication is not None
     assert result.deduplication.keep == "last"
+    assert result.filters[0].operator == "not_equals"
     assert result.sorting[0].ascending is False
     assert result.output_format == "xlsx"
 
@@ -90,6 +92,11 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
         {"deduplication": {"columns": "email"}},
         {"deduplication": {"columns": []}},
         {"deduplication": {"keep": "middle"}},
+        {"filters": ["email"]},
+        {"filters": [{"column": "", "value": "x"}]},
+        {"filters": [{"column": "email", "operator": "contains", "value": "x"}]},
+        {"filters": [{"column": "email", "value": [], "include": True}]},
+        {"filters": [{"column": "email", "value": "x", "include": "yes"}]},
         {"sorting": ["email"]},
         {"sorting": [{"column": ""}]},
         {"sorting": [{"column": "email", "ascending": "yes"}]},
