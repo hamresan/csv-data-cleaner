@@ -6,6 +6,7 @@ from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
+from csv_data_cleaner.application.contracts import EmailSyntaxChecker
 from csv_data_cleaner.application.dates import DateParser
 from csv_data_cleaner.application.deduplication import RowDeduplicator
 from csv_data_cleaner.application.mappers import RowResultMapper
@@ -16,7 +17,6 @@ from csv_data_cleaner.application.normalization import (
     StringValueNormalizer,
 )
 from csv_data_cleaner.application.processing import DatasetProcessor, RowProcessor
-from csv_data_cleaner.application.contracts import EmailSyntaxChecker
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
     EmailValueValidator,
