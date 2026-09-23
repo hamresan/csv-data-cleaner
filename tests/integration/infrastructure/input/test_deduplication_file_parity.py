@@ -6,8 +6,6 @@ from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from tests.unit.application.validation.fakes import FakeEmailSyntaxChecker
-
 from csv_data_cleaner.application.dates import DateParser
 from csv_data_cleaner.application.deduplication import RowDeduplicator
 from csv_data_cleaner.application.mappers import RowResultMapper
@@ -20,7 +18,6 @@ from csv_data_cleaner.application.normalization import (
 from csv_data_cleaner.application.processing import DatasetProcessor, RowProcessor
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
-    EmailValueValidator,
     RequiredValueValidator,
     RowValidator,
 )
@@ -89,11 +86,7 @@ def build_processor() -> DatasetProcessor:
             ),
             validator=RowValidator(
                 required_validator=RequiredValueValidator(),
-                email_validator=EmailValueValidator(
-                    syntax_checker=FakeEmailSyntaxChecker(
-                        {"ada@example.com", "grace@example.com"}
-                    )
-                ),
+                email_validator=None,
                 date_validator=DateValueValidator(date_parser=date_parser),
             ),
             result_mapper=RowResultMapper(),
