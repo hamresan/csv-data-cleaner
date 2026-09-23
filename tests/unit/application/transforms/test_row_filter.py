@@ -1,6 +1,6 @@
 """Behavioral tests for row filtering."""
 
-from csv_data_cleaner.application.transforms import RowFilter
+from csv_data_cleaner.application.transforms import FilterRuleEvaluator, RowFilter
 from csv_data_cleaner.domain import DataRow, FilterOperator, FilterRule, RowProcessingResult
 
 
@@ -20,7 +20,7 @@ def test_filter_applies_inclusion_and_exclusion_rules() -> None:
         FilterRule("active", FilterOperator.EQUALS, False, include=False),
     )
 
-    retained, filtered = RowFilter().apply(rows, rules)
+    retained, filtered = RowFilter(FilterRuleEvaluator()).apply(rows, rules)
 
     assert tuple(item.source_row.number for item in retained) == (2,)
     assert tuple(item.source_row.number for item in filtered) == (3, 4)
