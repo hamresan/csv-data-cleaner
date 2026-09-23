@@ -30,7 +30,11 @@ class PandasResultExporter(Exporter):
             if config.output_format is OutputFormat.CSV:
                 cleaned.to_csv(output_file, index=False)
             else:
-                cleaned.to_excel(  # pyright: ignore[reportUnknownMemberType]\n                    output_file, index=False, engine="openpyxl"\n                )
+                cleaned.to_excel(  # pyright: ignore[reportUnknownMemberType]
+                    output_file,
+                    index=False,
+                    engine="openpyxl",
+                )
 
             self.frame_mapper.invalid(result).to_csv(
                 output_dir / "invalid_rows.csv",
