@@ -57,6 +57,7 @@ def build_config() -> ProcessingConfig:
         ),
         normalization=NormalizationPolicy(),
         deduplication=None,
+        filters=(),
         sorting=(),
         output_format=OutputFormat.CSV,
     )
@@ -92,6 +93,7 @@ def test_processor_applies_configured_case_normalization_and_preserves_source() 
         date_rules=config.date_rules,
         normalization=NormalizationPolicy(casefold_columns=("email",)),
         deduplication=config.deduplication,
+        filters=config.filters,
         sorting=config.sorting,
         output_format=config.output_format,
     )
@@ -150,6 +152,7 @@ def test_processor_does_not_validate_canonical_date_against_source_formats() -> 
         date_rules=(DateValidationRule("created_at", ("%d/%m/%Y",)),),
         normalization=NormalizationPolicy(date_output_format="%Y.%m.%d"),
         deduplication=None,
+        filters=(),
         sorting=(),
         output_format=OutputFormat.CSV,
     )

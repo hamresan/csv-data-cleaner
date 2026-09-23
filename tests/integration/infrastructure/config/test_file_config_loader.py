@@ -22,6 +22,7 @@ CONFIG = {
     "validation": {"email_columns": ["email"], "date_columns": []},
     "normalization": {"casefold_columns": ["email"]},
     "deduplication": {"columns": ["email"], "keep": "last"},
+    "filters": [{"column": "name", "operator": "equals", "value": "Ada"}],
     "sorting": [{"column": "name", "ascending": True}],
     "output": {"format": "xlsx"},
 }
@@ -50,6 +51,7 @@ def test_supported_config_formats_map_to_same_domain_config(tmp_path: Path, suff
     assert config.normalization.casefold_columns == ("email",)
     assert config.deduplication is not None
     assert config.deduplication.keep is DeduplicationKeep.LAST
+    assert config.filters[0].column == "name"
     assert config.output_format is OutputFormat.XLSX
 
 

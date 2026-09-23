@@ -5,6 +5,7 @@ from csv_data_cleaner.infrastructure.types.config_value import ConfigObject
 from csv_data_cleaner.infrastructure.types.processing_config_data import (
     DateValidationConfigData,
     DeduplicationConfigData,
+    FilterConfigData,
     NormalizationConfigData,
     ProcessingConfigData,
     SortConfigData,
@@ -24,6 +25,7 @@ class ProcessingConfigValidator:
         normalization = fields.object_or_empty(data.get("normalization"), "normalization")
         output = fields.object_or_empty(data.get("output"), "output")
         deduplication = fields.optional_object(data.get("deduplication"), "deduplication")
+        filters = fields.objects(data.get("filters", []), "filters")
         sorting = fields.objects(data.get("sorting", []), "sorting")
 
         date_columns = fields.strings(
@@ -97,6 +99,19 @@ class ProcessingConfigValidator:
                 ),
             ),
             deduplication=deduplication_data,
+            filters=tuple(
+                FilterConfigData(
+                    column=fields.required_string(item.get("column"), "filters.column"),
+                    operator=fields.choice(
+                        item.get("operator", "equals"),
+                        "filters.operator",
+                        {"equals", "not_equals"},
+                    ),
+                    value=fields.scalar(item.get("value"), "filters.value"),
+                    include=fields.boolean(item.get("include", True), "filters.include"),
+                )
+                for item in filters
+            ),
             sorting=tuple(
                 SortConfigData(
                     column=fields.required_string(item.get("column"), "sorting.column"),

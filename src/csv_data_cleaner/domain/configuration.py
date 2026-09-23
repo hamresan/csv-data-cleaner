@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from csv_data_cleaner.domain.input_data import CellValue
+
 
 class DeduplicationKeep(StrEnum):
     """Record retention strategy for duplicate groups."""
@@ -16,6 +18,23 @@ class OutputFormat(StrEnum):
 
     CSV = "csv"
     XLSX = "xlsx"
+
+
+class FilterOperator(StrEnum):
+    """Supported row-filter comparison operators."""
+
+    EQUALS = "equals"
+    NOT_EQUALS = "not_equals"
+
+
+@dataclass(frozen=True, slots=True)
+class FilterRule:
+    """A configured inclusion or exclusion filter."""
+
+    column: str
+    operator: FilterOperator
+    value: CellValue
+    include: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +80,7 @@ class ProcessingConfig:
     date_rules: tuple[DateValidationRule, ...]
     normalization: NormalizationPolicy
     deduplication: DeduplicationPolicy | None
+    filters: tuple[FilterRule, ...]
     sorting: tuple[SortRule, ...]
     output_format: OutputFormat
 

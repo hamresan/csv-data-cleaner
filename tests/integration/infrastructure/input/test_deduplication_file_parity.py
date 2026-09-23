@@ -19,6 +19,15 @@ from csv_data_cleaner.application.normalization import (
     StringValueNormalizer,
 )
 from csv_data_cleaner.application.processing import DatasetProcessor, RowProcessor
+from csv_data_cleaner.application.transforms import (
+    FilterRuleEvaluator,
+    FilterSchemaValidator,
+    FilterSortProcessor,
+    RowFilter,
+    RowSorter,
+    SortSchemaValidator,
+    SortValueKeyBuilder,
+)
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
     EmailValueValidator,
@@ -33,9 +42,9 @@ from csv_data_cleaner.domain import (
     ProcessingConfig,
 )
 from csv_data_cleaner.infrastructure.input import PandasInputReader
-from csv_data_cleaner.infrastructure.validation import EmailValidatorSyntaxChecker
 from csv_data_cleaner.infrastructure.mappers.cell_value_mapper import CellValueMapper
 from csv_data_cleaner.infrastructure.mappers.data_frame_input_mapper import DataFrameInputMapper
+from csv_data_cleaner.infrastructure.validation import EmailValidatorSyntaxChecker
 from csv_data_cleaner.infrastructure.validators.data_frame_header_validator import (
     DataFrameHeaderValidator,
 )
@@ -98,6 +107,11 @@ def build_processor() -> DatasetProcessor:
         ),
         row_deduplicator=RowDeduplicator(),
         deduplication_schema_validator=DeduplicationSchemaValidator(),
+        filter_sort_processor=FilterSortProcessor(
+            RowFilter(FilterRuleEvaluator()), RowSorter(SortValueKeyBuilder())
+        ),
+        filter_schema_validator=FilterSchemaValidator(),
+        sort_schema_validator=SortSchemaValidator(),
     )
 
 
@@ -111,6 +125,7 @@ def build_config(keep: DeduplicationKeep) -> ProcessingConfig:
             columns=("email", "country"),
             keep=keep,
         ),
+        filters=(),
         sorting=(),
         output_format=OutputFormat.CSV,
     )

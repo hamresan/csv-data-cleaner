@@ -17,6 +17,7 @@ class StubConfigLoader(ConfigLoader):
             date_rules=(),
             normalization=NormalizationPolicy(),
             deduplication=None,
+            filters=(),
             sorting=(),
             output_format=OutputFormat.CSV,
         )

@@ -5,6 +5,7 @@ from csv_data_cleaner.infrastructure.mappers.processing_config_mapper import Pro
 from csv_data_cleaner.infrastructure.types.processing_config_data import (
     DateValidationConfigData,
     DeduplicationConfigData,
+    FilterConfigData,
     NormalizationConfigData,
     ProcessingConfigData,
     SortConfigData,
@@ -31,6 +32,7 @@ def test_mapper_builds_domain_configuration() -> None:
             columns=("email",),
             keep="last",
         ),
+        filters=(FilterConfigData("email", "not_equals", None, True),),
         sorting=(SortConfigData(column="email", ascending=False),),
         output_format="xlsx",
     )
@@ -44,5 +46,6 @@ def test_mapper_builds_domain_configuration() -> None:
     assert result.normalization.casefold_columns == ("email",)
     assert result.deduplication is not None
     assert result.deduplication.keep is DeduplicationKeep.LAST
+    assert result.filters[0].column == "email"
     assert result.sorting[0].ascending is False
     assert result.output_format is OutputFormat.XLSX
