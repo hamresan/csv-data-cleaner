@@ -134,6 +134,14 @@ Rules are intentionally configurable, so the same tool can support different dat
 
 A missing required **value** makes a row invalid. A missing required **column** stops processing with a clear configuration error.
 
+### Deduplication behavior
+
+Deduplication runs after normalization and validation and compares the normalized values of all configured key columns. Composite keys require every configured key value to match. `keep: first` retains the first matching row in source order, while `keep: last` retains the last.
+
+Missing key values participate in the duplicate key. This means two rows with the same normalized key, including `null` in the same key positions, are duplicates. For example, when `email` is the only duplicate key, two rows whose normalized `email` is `null` belong to the same duplicate group.
+
+Validation status does not exclude a row from duplicate detection. If duplicate rows are also validation-invalid, dropped rows are classified as duplicates and kept separately for duplicate review rather than being counted again among retained invalid rows. Their original source values and validation issues remain available in the processing result.
+
 ## Command reference
 
 ```text
