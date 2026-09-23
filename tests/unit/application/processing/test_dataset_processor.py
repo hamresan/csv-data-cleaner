@@ -3,7 +3,10 @@
 from tests.unit.application.validation.fakes import FakeEmailSyntaxChecker
 
 from csv_data_cleaner.application.dates import DateParser
-from csv_data_cleaner.application.deduplication import (\n    DeduplicationSchemaValidator,\n    RowDeduplicator,\n)
+from csv_data_cleaner.application.deduplication import (
+    DeduplicationSchemaValidator,
+    RowDeduplicator,
+)
 from csv_data_cleaner.application.mappers import RowResultMapper
 from csv_data_cleaner.application.normalization import (
     DateRowNormalizer,
@@ -27,6 +30,7 @@ from csv_data_cleaner.domain import (
     OutputFormat,
     ProcessingConfig,
 )
+from csv_data_cleaner.domain.errors import InputDataError
 
 
 def build_processor() -> DatasetProcessor:
@@ -49,6 +53,7 @@ def build_processor() -> DatasetProcessor:
             result_mapper=RowResultMapper(),
         ),
         row_deduplicator=RowDeduplicator(),
+        deduplication_schema_validator=DeduplicationSchemaValidator(),
     )
 
 
@@ -181,7 +186,6 @@ def test_processor_counts_invalid_duplicate_only_as_duplicate_after_deduplicatio
     assert not duplicate.row.is_valid
     assert duplicate.retained_row_number == 2
     assert len(result.invalid_rows) + len(result.duplicate_rows) == 2
-
 
 
 def test_processor_rejects_missing_deduplication_columns() -> None:
