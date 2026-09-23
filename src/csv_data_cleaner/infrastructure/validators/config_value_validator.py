@@ -25,6 +25,8 @@ class ConfigValueValidator:
     def parse_value(self, value: object, field: str) -> ConfigValue:
         if value is None or isinstance(value, str | bool):
             return value
+        if isinstance(value, int | float):
+            return value
         if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
             sequence = cast(Sequence[object], value)
             return [self.parse_value(item, field) for item in sequence]
