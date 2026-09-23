@@ -80,7 +80,7 @@ class ProcessingConfig:
     date_rules: tuple[DateValidationRule, ...]
     normalization: NormalizationPolicy
     deduplication: DeduplicationPolicy | None
-    filters: tuple[FilterRule, ...] = ()
+    filters: tuple[FilterRule, ...]
     sorting: tuple[SortRule, ...]
     output_format: OutputFormat
 
