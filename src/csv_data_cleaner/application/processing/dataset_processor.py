@@ -1,6 +1,9 @@
 """Process canonical input rows through normalization, validation, and deduplication."""
 
-from csv_data_cleaner.application.deduplication import (\n    DeduplicationSchemaValidator,\n    RowDeduplicator,\n)
+from csv_data_cleaner.application.deduplication import (
+    DeduplicationSchemaValidator,
+    RowDeduplicator,
+)
 from csv_data_cleaner.application.processing.row_processor import RowProcessor
 from csv_data_cleaner.domain import (
     DatasetProcessingResult,
@@ -16,9 +19,11 @@ class DatasetProcessor:
         self,
         row_processor: RowProcessor,
         row_deduplicator: RowDeduplicator,
+        deduplication_schema_validator: DeduplicationSchemaValidator,
     ) -> None:
         self.row_processor = row_processor
         self.row_deduplicator = row_deduplicator
+        self.deduplication_schema_validator = deduplication_schema_validator
 
     def process(
         self,
@@ -31,6 +36,7 @@ class DatasetProcessor:
         if config.deduplication is None:
             return DatasetProcessingResult(rows=processed_rows)
 
+        self.deduplication_schema_validator.validate(input_data, config.deduplication)
         deduplication_result = self.row_deduplicator.deduplicate(
             processed_rows,
             config.deduplication,
