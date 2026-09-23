@@ -1,6 +1,7 @@
 """Pandas-backed CSV and XLSX input adapter."""
 
 from pathlib import Path
+from zipfile import BadZipFile
 
 import pandas as pd
 from pandas import DataFrame
@@ -34,7 +35,7 @@ class PandasInputReader(InputReader):
                 )
             else:
                 raise InputDataError(f"Unsupported input format: {suffix}")
-        except (OSError, ValueError, pd.errors.ParserError) as error:
+        except (OSError, ValueError, BadZipFile, pd.errors.ParserError) as error:
             raise InputDataError(f"Could not read input file: {path}") from error
 
         return self.mapper.map(frame)
