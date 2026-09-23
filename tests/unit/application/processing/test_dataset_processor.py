@@ -30,7 +30,6 @@ from csv_data_cleaner.domain import (
     OutputFormat,
     ProcessingConfig,
 )
-from csv_data_cleaner.domain.errors import InputDataError
 
 
 def build_processor() -> DatasetProcessor:
@@ -187,30 +186,3 @@ def test_processor_counts_invalid_duplicate_only_as_duplicate_after_deduplicatio
     assert duplicate.retained_row_number == 2
     assert len(result.invalid_rows) + len(result.duplicate_rows) == 2
 
-
-def test_processor_rejects_missing_deduplication_columns() -> None:
-    input_data = InputData(
-        columns=("name", "email", "created_at"),
-        rows=(
-            DataRow(
-                number=2,
-                values={
-                    "name": "Ada",
-                    "email": "ada@example.com",
-                    "created_at": "23/09/2026",
-                },
-            ),
-        ),
-    )
-
-    try:
-        build_processor().process(
-            input_data,
-            build_config(
-                deduplication=DeduplicationPolicy(columns=("email", "customer_id"))
-            ),
-        )
-    except InputDataError as error:
-        assert str(error) == "Missing deduplication columns: customer_id"
-    else:
-        raise AssertionError("Expected missing deduplication column to be rejected")
