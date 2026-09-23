@@ -57,7 +57,7 @@ class ProcessingConfigValidator:
         deduplication_data = None
         if deduplication is not None:
             deduplication_data = DeduplicationConfigData(
-                columns=fields.strings(
+                columns=fields.non_empty_strings(
                     deduplication.get("columns", []),
                     "deduplication.columns",
                 ),
