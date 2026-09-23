@@ -2,7 +2,7 @@
 
 A configurable command-line tool for cleaning, validating, deduplicating, and reporting on CSV and Excel data.
 
-> **Status:** Under active development. This README defines the planned public interface for the first release. The project foundation and CLI entry point are implemented. Feature commands remain under active development until version `0.1.0` is complete.
+> **Status:** Under active development toward version `0.1.0`. The documented `clean` command, CSV/XLSX processing pipeline, exports, reporting, dry-run behavior, and expected CLI error handling are implemented and covered by automated tests.
 
 ## Why this project?
 
@@ -118,6 +118,7 @@ Example `report.json`:
   "valid_records": 1087,
   "invalid_records": 73,
   "duplicate_records": 40,
+  "exported_records": 1087,
   "output_file": "output/cleaned.xlsx"
 }
 ```
@@ -176,6 +177,20 @@ csv-data-cleaner clean
 - `--output-dir`: Directory for generated files.
 - `--sheet`: Optional Excel worksheet name.
 - `--dry-run`: Validate and show the summary without writing output files.
+
+### Dry run
+
+Use `--dry-run` to execute configuration loading, input reading, validation, normalization, deduplication, filtering, sorting, and report calculation without creating the output directory or writing files:
+
+```bash
+uv run csv-data-cleaner clean \
+  --input examples/customers.xlsx \
+  --config rules.yaml \
+  --output-dir output \
+  --dry-run
+```
+
+Expected input, configuration, and output errors are shown as concise CLI messages with a non-zero exit code and no stack trace by default.
 
 ## Development
 
