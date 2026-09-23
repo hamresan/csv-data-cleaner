@@ -30,13 +30,15 @@ class DatasetProcessor:
         input_data: InputData,
         config: ProcessingConfig,
     ) -> DatasetProcessingResult:
+        if config.deduplication is not None:
+            self.deduplication_schema_validator.validate(input_data, config.deduplication)
+
         processed_rows = tuple(
             self.row_processor.process(source_row=row, config=config) for row in input_data.rows
         )
         if config.deduplication is None:
             return DatasetProcessingResult(rows=processed_rows)
 
-        self.deduplication_schema_validator.validate(input_data, config.deduplication)
         deduplication_result = self.row_deduplicator.deduplicate(
             processed_rows,
             config.deduplication,
