@@ -29,8 +29,8 @@ from csv_data_cleaner.application.transforms import (
     FilterSortProcessor,
     RowFilter,
     RowSorter,
-    SortValueKeyBuilder,
     SortSchemaValidator,
+    SortValueKeyBuilder,
 )
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
@@ -67,7 +67,10 @@ def processor() -> DatasetProcessor:
         ),
         row_deduplicator=RowDeduplicator(),
         deduplication_schema_validator=DeduplicationSchemaValidator(),
-        filter_sort_processor=FilterSortProcessor(RowFilter(FilterRuleEvaluator()), RowSorter(SortValueKeyBuilder())),
+        filter_sort_processor=FilterSortProcessor(
+            RowFilter(FilterRuleEvaluator()),
+            RowSorter(SortValueKeyBuilder()),
+        ),
         filter_schema_validator=FilterSchemaValidator(),
         sort_schema_validator=SortSchemaValidator(),
     )
