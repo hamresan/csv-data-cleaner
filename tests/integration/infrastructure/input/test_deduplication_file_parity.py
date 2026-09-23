@@ -16,8 +16,10 @@ from csv_data_cleaner.application.normalization import (
     StringValueNormalizer,
 )
 from csv_data_cleaner.application.processing import DatasetProcessor, RowProcessor
+from csv_data_cleaner.application.contracts import EmailSyntaxChecker
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
+    EmailValueValidator,
     RequiredValueValidator,
     RowValidator,
 )
@@ -34,6 +36,13 @@ from csv_data_cleaner.infrastructure.mappers.data_frame_input_mapper import Data
 from csv_data_cleaner.infrastructure.validators.data_frame_header_validator import (
     DataFrameHeaderValidator,
 )
+
+
+class AcceptAllEmailSyntaxChecker(EmailSyntaxChecker):
+    """Accept email syntax because this test does not exercise email validation."""
+
+    def is_valid(self, value: str) -> bool:
+        return True
 
 
 def active_sheet(workbook: Workbook) -> Worksheet:
@@ -86,7 +95,7 @@ def build_processor() -> DatasetProcessor:
             ),
             validator=RowValidator(
                 required_validator=RequiredValueValidator(),
-                email_validator=None,
+                email_validator=EmailValueValidator(syntax_checker=AcceptAllEmailSyntaxChecker()),
                 date_validator=DateValueValidator(date_parser=date_parser),
             ),
             result_mapper=RowResultMapper(),
