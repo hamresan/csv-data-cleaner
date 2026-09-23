@@ -1,6 +1,7 @@
 """Domain model public API."""
 
 from csv_data_cleaner.domain.models import (
+    CellValue,
     DataRow,
     DeduplicationKeep,
     DeduplicationPolicy,
@@ -13,6 +14,7 @@ from csv_data_cleaner.domain.models import (
 )
 
 __all__ = [
+    "CellValue",
     "DataRow",
     "DeduplicationKeep",
     "DeduplicationPolicy",
