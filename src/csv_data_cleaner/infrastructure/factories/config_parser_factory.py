@@ -3,8 +3,8 @@
 from pathlib import Path
 
 from csv_data_cleaner.domain.errors import ConfigurationError
-from csv_data_cleaner.infrastructure.parsers.json_config_parser import JsonConfigParser
 from csv_data_cleaner.infrastructure.contracts.config_parser import ConfigParser
+from csv_data_cleaner.infrastructure.parsers.json_config_parser import JsonConfigParser
 from csv_data_cleaner.infrastructure.parsers.yaml_config_parser import YamlConfigParser
 
 
