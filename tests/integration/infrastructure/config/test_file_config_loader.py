@@ -11,6 +11,7 @@ from csv_data_cleaner.domain.errors import ConfigurationError
 from csv_data_cleaner.infrastructure.config import FileConfigLoader
 from csv_data_cleaner.infrastructure.factories.config_parser_factory import ConfigParserFactory
 from csv_data_cleaner.infrastructure.mappers.processing_config_mapper import ProcessingConfigMapper
+from csv_data_cleaner.infrastructure.validators.config_field_validator import ConfigFieldValidator
 from csv_data_cleaner.infrastructure.validators.config_value_validator import ConfigValueValidator
 from csv_data_cleaner.infrastructure.validators.processing_config_validator import (
     ProcessingConfigValidator,
@@ -29,7 +30,7 @@ def build_loader() -> FileConfigLoader:
     return FileConfigLoader(
         parser_factory=ConfigParserFactory(),
         value_validator=ConfigValueValidator(),
-        config_validator=ProcessingConfigValidator(),
+        config_validator=ProcessingConfigValidator(field_validator=ConfigFieldValidator()),
         mapper=ProcessingConfigMapper(),
     )
 

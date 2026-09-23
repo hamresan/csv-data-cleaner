@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from csv_data_cleaner.application.ports import ConfigLoader
-from csv_data_cleaner.domain import OutputFormat, ProcessingConfig
+from csv_data_cleaner.domain import NormalizationPolicy, OutputFormat, ProcessingConfig
 
 
 class StubConfigLoader(ConfigLoader):
@@ -14,7 +14,8 @@ class StubConfigLoader(ConfigLoader):
         return ProcessingConfig(
             required_columns=(),
             email_columns=(),
-            date_columns=(),
+            date_rules=(),
+            normalization=NormalizationPolicy(),
             deduplication=None,
             sorting=(),
             output_format=OutputFormat.CSV,

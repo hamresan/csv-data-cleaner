@@ -35,12 +35,36 @@ class DeduplicationPolicy:
 
 
 @dataclass(frozen=True, slots=True)
+class DateValidationRule:
+    """Accepted source formats for one configured date column."""
+
+    column: str
+    formats: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class NormalizationPolicy:
+    """Configured canonicalization behavior for input values."""
+
+    trim_whitespace: bool = True
+    empty_strings_as_null: bool = True
+    date_output_format: str = "%Y-%m-%d"
+
+
+@dataclass(frozen=True, slots=True)
 class ProcessingConfig:
     """Validated configuration consumed by the application pipeline."""
 
     required_columns: tuple[str, ...]
     email_columns: tuple[str, ...]
-    date_columns: tuple[str, ...]
+    date_rules: tuple[DateValidationRule, ...]
+    normalization: NormalizationPolicy
     deduplication: DeduplicationPolicy | None
     sorting: tuple[SortRule, ...]
     output_format: OutputFormat
+
+    @property
+    def date_columns(self) -> tuple[str, ...]:
+        """Return configured date columns in deterministic order."""
+
+        return tuple(rule.column for rule in self.date_rules)

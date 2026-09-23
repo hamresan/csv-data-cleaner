@@ -59,6 +59,15 @@ validation:
     - email
   date_columns:
     - signup_date
+  date_formats:
+    signup_date:
+      - "%Y-%m-%d"
+      - "%d/%m/%Y"
+
+normalization:
+  trim_whitespace: true
+  empty_strings_as_null: true
+  date_output_format: "%Y-%m-%d"
 
 deduplication:
   columns:
@@ -114,6 +123,10 @@ Rules are intentionally configurable, so the same tool can support different dat
 | `required_columns` | Columns that must exist in the input file |
 | `validation.email_columns` | Columns that must contain valid email addresses |
 | `validation.date_columns` | Columns that must contain valid dates |
+| `validation.date_formats` | Accepted input formats for configured date columns; defaults to `%Y-%m-%d` |
+| `normalization.trim_whitespace` | Trim leading/trailing whitespace from strings; defaults to `true` |
+| `normalization.empty_strings_as_null` | Convert empty normalized strings to null; defaults to `true` |
+| `normalization.date_output_format` | Canonical date representation; defaults to `%Y-%m-%d` |
 | `deduplication.columns` | One or more columns used to identify duplicates |
 | `deduplication.keep` | Which duplicate to keep: `first` or `last` |
 | `sorting` | Ordered list of output sorting rules |
