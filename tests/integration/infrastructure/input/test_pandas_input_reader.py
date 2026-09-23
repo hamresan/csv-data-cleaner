@@ -79,3 +79,42 @@ def test_reader_rejects_unreadable_or_unsupported_input(tmp_path: Path, filename
 
     with pytest.raises(InputDataError):
         build_reader().read(path)
+
+
+def test_xlsx_rejects_missing_requested_sheet(tmp_path: Path) -> None:
+    path = tmp_path / "customers.xlsx"
+    workbook = Workbook()
+    worksheet = active_sheet(workbook)
+    worksheet.title = "Customers"
+    worksheet.append(["name"])
+    workbook.save(path)
+
+    with pytest.raises(InputDataError, match="Could not read input file"):
+        build_reader().read(path, sheet="Missing")
+
+
+@pytest.mark.parametrize("suffix", [".csv", ".xlsx"])
+def test_reader_rejects_empty_physical_header(tmp_path: Path, suffix: str) -> None:
+    path = tmp_path / f"customers{suffix}"
+    if suffix == ".csv":
+        path.write_text(",email\nAda,ada@example.com\n", encoding="utf-8")
+    else:
+        workbook = Workbook()
+        worksheet = active_sheet(workbook)
+        worksheet.append([None, "email"])
+        worksheet.append(["Ada", "ada@example.com"])
+        workbook.save(path)
+
+    with pytest.raises(
+        InputDataError,
+        match="Input must contain non-empty column headers",
+    ):
+        build_reader().read(path)
+
+
+def test_reader_rejects_malformed_xlsx(tmp_path: Path) -> None:
+    path = tmp_path / "broken.xlsx"
+    path.write_text("not an xlsx workbook", encoding="utf-8")
+
+    with pytest.raises(InputDataError, match="Could not read input file"):
+        build_reader().read(path)
