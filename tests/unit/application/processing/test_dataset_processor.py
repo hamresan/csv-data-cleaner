@@ -15,6 +15,13 @@ from csv_data_cleaner.application.normalization import (
     StringValueNormalizer,
 )
 from csv_data_cleaner.application.processing import DatasetProcessor, RowProcessor
+from csv_data_cleaner.application.transforms import (
+    FilterSchemaValidator,
+    FilterSortProcessor,
+    RowFilter,
+    RowSorter,
+    SortSchemaValidator,
+)
 from csv_data_cleaner.application.validation import (
     DateValueValidator,
     EmailValueValidator,
@@ -53,6 +60,9 @@ def build_processor() -> DatasetProcessor:
         ),
         row_deduplicator=RowDeduplicator(),
         deduplication_schema_validator=DeduplicationSchemaValidator(),
+        filter_sort_processor=FilterSortProcessor(RowFilter(), RowSorter()),
+        filter_schema_validator=FilterSchemaValidator(),
+        sort_schema_validator=SortSchemaValidator(),
     )
 
 
@@ -70,6 +80,7 @@ def build_config(
         ),
         normalization=NormalizationPolicy(date_output_format="%Y.%m.%d"),
         deduplication=deduplication,
+        filters=(),
         sorting=(),
         output_format=OutputFormat.CSV,
     )
