@@ -3,8 +3,8 @@
 import pytest
 
 from csv_data_cleaner.domain.errors import ConfigurationError
-from csv_data_cleaner.infrastructure.validators.config_field_validator import ConfigFieldValidator
 from csv_data_cleaner.infrastructure.types.config_value import ConfigObject
+from csv_data_cleaner.infrastructure.validators.config_field_validator import ConfigFieldValidator
 from csv_data_cleaner.infrastructure.validators.processing_config_validator import (
     ProcessingConfigValidator,
 )
@@ -100,8 +100,10 @@ INVALID_CONFIGS: list[ConfigObject] = [
         {"sorting": [{"column": ""}]},
         {"sorting": [{"column": "email", "ascending": "yes"}]},
         {"output": {"format": "json"}},
-    ],
-)
+]
+
+
+@pytest.mark.parametrize("config", INVALID_CONFIGS)
 def test_validator_rejects_invalid_schema(config: ConfigObject) -> None:
     with pytest.raises(ConfigurationError):
         build_validator().validate(config)
