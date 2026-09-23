@@ -12,7 +12,3 @@ def cli() -> None:
 def main() -> None:
     """Run the CSV Data Cleaner command-line interface."""
     cli()
-
-
-if __name__ == "__main__":
-    main()
