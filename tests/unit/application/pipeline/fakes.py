@@ -55,13 +55,13 @@ class FakeExporter(Exporter):
 class FakeReportCalculator(ReportCalculator):
     def __init__(self, summary: ProcessingSummary) -> None:
         self.summary = summary
-        self.calls: list[tuple[Path, DatasetProcessingResult, Path]] = []
+        self.calls: list[tuple[Path, DatasetProcessingResult, Path | None]] = []
 
     def calculate(
         self,
         input_path: Path,
         result: DatasetProcessingResult,
-        output_file: Path,
+        output_file: Path | None,
     ) -> ProcessingSummary:
         self.calls.append((input_path, result, output_file))
         return self.summary
