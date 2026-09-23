@@ -8,7 +8,8 @@ from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from csv_data_cleaner.domain.errors import InputDataError
-from csv_data_cleaner.infrastructure.input import DataFrameInputMapper, PandasInputReader
+from csv_data_cleaner.infrastructure.input import PandasInputReader
+from csv_data_cleaner.infrastructure.mappers.data_frame_input_mapper import DataFrameInputMapper
 
 
 def build_reader() -> PandasInputReader:
