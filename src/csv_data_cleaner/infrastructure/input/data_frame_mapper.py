@@ -1,6 +1,5 @@
 """Map pandas data frames to canonical input data."""
 
-import pandas as pd
 from pandas import DataFrame
 
 from csv_data_cleaner.domain import DataRow, InputData
@@ -28,7 +27,9 @@ class DataFrameInputMapper:
         return InputData(columns=columns, rows=rows)
 
     def cell_value(self, value: object) -> str | int | float | bool | None:
-        if pd.isna(value):
+        if value is None:
+            return None
+        if isinstance(value, float) and value != value:
             return None
         if isinstance(value, str | int | float | bool):
             return value
