@@ -1,4 +1,5 @@
-"""Application composition root.
+"""Application composition root public API."""
 
-Dependency wiring will be added here as concrete application boundaries are introduced.
-"""
+from csv_data_cleaner.composition_root.clean_data_factory import build_clean_data_use_case
+
+__all__ = ["build_clean_data_use_case"]
