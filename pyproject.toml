@@ -10,6 +10,7 @@ dependencies = [
     "click>=8.1,<9",
     "openpyxl>=3.1,<4",
     "pandas>=2.2,<3",
+    "pyyaml>=6,<7",
 ]
 
 [project.scripts]
@@ -17,10 +18,12 @@ csv-data-cleaner = "csv_data_cleaner.presentation.cli:main"
 
 [dependency-groups]
 dev = [
+    "pandas-stubs>=2.2,<3",
     "pyright>=1.1.390",
     "pytest>=8.3,<9",
     "pytest-cov>=6,<7",
     "ruff>=0.11,<1",
+    "types-pyyaml>=6,<7",
 ]
 
 [build-system]
