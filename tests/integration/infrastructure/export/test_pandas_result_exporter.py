@@ -69,7 +69,10 @@ def test_exporter_writes_readable_cleaned_and_review_files(
     if output_format is OutputFormat.CSV:
         cleaned = pd.read_csv(output_file)
     else:
-        cleaned = pd.read_excel(output_file, engine="openpyxl")
+        cleaned = pd.read_excel(  # pyright: ignore[reportUnknownMemberType]
+            output_file,
+            engine="openpyxl",
+        )
     invalid_rows = pd.read_csv(output_dir / "invalid_rows.csv")
     duplicate_rows = pd.read_csv(output_dir / "duplicate_rows.csv")
 
