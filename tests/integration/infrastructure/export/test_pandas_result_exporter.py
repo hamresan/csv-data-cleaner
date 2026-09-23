@@ -96,6 +96,25 @@ def test_exporter_writes_headers_for_empty_result_sets(tmp_path: Path) -> None:
     assert (output_dir / "duplicate_rows.csv").read_text(encoding="utf-8") == "name,email\n"
 
 
+def test_exporter_writes_readable_empty_xlsx_with_headers(tmp_path: Path) -> None:
+    result = DatasetProcessingResult(rows=(), columns=("name", "email"))
+    output_dir = tmp_path / "output"
+
+    output_file = PandasResultExporter(ResultFrameMapper()).export(
+        result,
+        config(OutputFormat.XLSX),
+        output_dir,
+    )
+
+    cleaned = pd.read_excel(  # pyright: ignore[reportUnknownMemberType]
+        output_file,
+        engine="openpyxl",
+    )
+
+    assert list(cleaned.columns) == ["name", "email"]
+    assert cleaned.empty
+
+
 def test_exporter_rejects_existing_output_directory(tmp_path: Path) -> None:
     output_dir = tmp_path / "output"
     output_dir.mkdir()
