@@ -13,7 +13,7 @@ class ProcessingReportCalculator(ReportCalculator):
         self,
         input_path: Path,
         result: DatasetProcessingResult,
-        output_file: Path,
+        output_file: Path | None,
     ) -> ProcessingSummary:
         return ProcessingSummary(
             input_file=input_path.name,
@@ -23,6 +23,6 @@ class ProcessingReportCalculator(ReportCalculator):
             valid_records=len(result.all_valid_rows),
             invalid_records=len(result.all_invalid_rows),
             duplicate_records=len(result.duplicate_rows),
-            exported_records=len(result.valid_rows),
-            output_file=str(output_file),
+            exported_records=0 if output_file is None else len(result.valid_rows),
+            output_file=None if output_file is None else str(output_file),
         )

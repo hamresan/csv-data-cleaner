@@ -12,3 +12,4 @@ class CleanDataRequest:
     config_path: Path
     output_dir: Path
     sheet: str | None = None
+    dry_run: bool = False
