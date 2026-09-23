@@ -1,4 +1,4 @@
-"""Domain errors for invalid input and configuration."""
+"""Domain errors for expected CSV Data Cleaner failures."""
 
 
 class DataCleanerError(Exception):
@@ -11,3 +11,7 @@ class InputDataError(DataCleanerError):
 
 class ConfigurationError(DataCleanerError):
     """Raised when a configuration file cannot satisfy the config contract."""
+
+
+class OutputDataError(DataCleanerError):
+    """Raised when output artifacts cannot be written safely."""

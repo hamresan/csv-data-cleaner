@@ -13,4 +13,5 @@ class ReportCalculator(Protocol):
         self,
         input_path: Path,
         result: DatasetProcessingResult,
+        output_file: Path,
     ) -> ProcessingSummary: ...
