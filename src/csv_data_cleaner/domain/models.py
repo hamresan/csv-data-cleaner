@@ -1,11 +1,11 @@
 """Immutable domain models used by the cleaning pipeline."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Mapping, TypeAlias
 
-CellValue: TypeAlias = str | int | float | bool | None
+type CellValue = str | int | float | bool | None
 
 
 class DeduplicationKeep(StrEnum):
