@@ -8,7 +8,7 @@ from pandas import DataFrame
 from csv_data_cleaner.application.ports import InputReader
 from csv_data_cleaner.domain import InputData
 from csv_data_cleaner.domain.errors import InputDataError
-from csv_data_cleaner.infrastructure.input.data_frame_mapper import DataFrameInputMapper
+from csv_data_cleaner.infrastructure.mappers.data_frame_input_mapper import DataFrameInputMapper
 
 
 class PandasInputReader(InputReader):
