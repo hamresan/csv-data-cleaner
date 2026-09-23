@@ -46,6 +46,11 @@ class ConfigFieldValidator:
             raise ConfigurationError(f"{field} must be a non-empty string.")
         return value
 
+    def scalar(self, value: ConfigValue, field: str) -> str | bool | None:
+        if value is None or isinstance(value, str | bool):
+            return value
+        raise ConfigurationError(f"{field} must be a string, boolean, or null.")
+
     def boolean(self, value: ConfigValue, field: str) -> bool:
         if not isinstance(value, bool):
             raise ConfigurationError(f"{field} must be a boolean.")
