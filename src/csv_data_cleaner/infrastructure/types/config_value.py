@@ -1,4 +1,4 @@
 """Typed raw configuration values."""
 
-type ConfigValue = str | bool | list["ConfigValue"] | dict[str, "ConfigValue"] | None
+type ConfigValue = str | int | float | bool | list["ConfigValue"] | dict[str, "ConfigValue"] | None
 type ConfigObject = dict[str, ConfigValue]
