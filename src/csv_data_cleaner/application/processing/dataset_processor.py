@@ -1,6 +1,6 @@
 """Process canonical input rows through normalization, validation, and deduplication."""
 
-from csv_data_cleaner.application.deduplication import RowDeduplicator
+from csv_data_cleaner.application.deduplication import (\n    DeduplicationSchemaValidator,\n    RowDeduplicator,\n)
 from csv_data_cleaner.application.processing.row_processor import RowProcessor
 from csv_data_cleaner.domain import (
     DatasetProcessingResult,
