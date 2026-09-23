@@ -24,6 +24,7 @@ def test_mapper_builds_domain_configuration() -> None:
         normalization=NormalizationConfigData(
             trim_whitespace=True,
             empty_strings_as_null=True,
+            casefold_columns=("email",),
             date_output_format="%Y-%m-%d",
         ),
         deduplication=DeduplicationConfigData(
@@ -40,6 +41,7 @@ def test_mapper_builds_domain_configuration() -> None:
     assert result.date_columns == ("signup_date",)
     assert result.date_rules[0].formats == ("%Y-%m-%d", "%d/%m/%Y")
     assert result.normalization.empty_strings_as_null is True
+    assert result.normalization.casefold_columns == ("email",)
     assert result.deduplication is not None
     assert result.deduplication.keep is DeduplicationKeep.LAST
     assert result.sorting[0].ascending is False

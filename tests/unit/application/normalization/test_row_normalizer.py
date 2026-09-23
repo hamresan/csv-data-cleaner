@@ -28,6 +28,19 @@ def test_string_row_normalizer_preserves_source_and_non_ascii_text() -> None:
     assert source.values == {"name": "  مهران  ", "note": "   "}
 
 
+def test_string_row_normalizer_casefolds_only_configured_columns() -> None:
+    source = DataRow(
+        number=7,
+        values={"name": "  Ada Lovelace  ", "email": "  Ada@Example.COM  "},
+    )
+    policy = NormalizationPolicy(casefold_columns=("email",))
+
+    result = StringRowNormalizer(value_normalizer=StringValueNormalizer()).normalize(source, policy)
+
+    assert result.values == {"name": "Ada Lovelace", "email": "ada@example.com"}
+    assert source.values == {"name": "  Ada Lovelace  ", "email": "  Ada@Example.COM  "}
+
+
 def test_date_row_normalizer_canonicalizes_configured_dates() -> None:
     source = DataRow(
         number=7,

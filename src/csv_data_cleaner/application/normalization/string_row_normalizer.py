@@ -11,10 +11,15 @@ class StringRowNormalizer:
         self.value_normalizer = value_normalizer
 
     def normalize(self, row: DataRow, policy: NormalizationPolicy) -> DataRow:
+        casefold_columns = frozenset(policy.casefold_columns)
         return DataRow(
             number=row.number,
             values={
-                column: self.value_normalizer.normalize(value, policy)
+                column: self.value_normalizer.normalize(
+                    value,
+                    policy,
+                    casefold=column in casefold_columns,
+                )
                 for column, value in row.values.items()
             },
         )
