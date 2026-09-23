@@ -22,9 +22,7 @@ class DataFrameHeaderValidator:
             raise InputDataError("Input must contain non-empty column headers.")
 
         columns = tuple(str(value) for value in headers)
-        duplicates = tuple(
-            column for column, count in Counter(columns).items() if count > 1
-        )
+        duplicates = tuple(column for column, count in Counter(columns).items() if count > 1)
         if duplicates:
             names = ", ".join(duplicates)
             raise InputDataError(f"Input contains duplicate column headers: {names}")

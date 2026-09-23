@@ -27,8 +27,7 @@ class ProcessingConfigMapper:
             date_columns=data.date_columns,
             deduplication=deduplication,
             sorting=tuple(
-                SortRule(column=item.column, ascending=item.ascending)
-                for item in data.sorting
+                SortRule(column=item.column, ascending=item.ascending) for item in data.sorting
             ),
             output_format=OutputFormat(data.output_format),
         )
