@@ -29,5 +29,6 @@ class ConfigValueParser:
             sequence = cast(Sequence[object], value)
             return [self.parse_value(item, field) for item in sequence]
         if isinstance(value, Mapping):
-            return self.parse_object(value, field)
+            mapping = cast(Mapping[object, object], value)
+            return self.parse_object(mapping, field)
         raise ConfigurationError(f"{field} contains an unsupported value.")
