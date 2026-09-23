@@ -2,13 +2,13 @@
 
 from pathlib import Path
 
-from tests.unit.application.pipeline.fakes import (
+from .fakes import (
     FakeConfigLoader,
     FakeExporter,
     FakeInputReader,
     FakeReportCalculator,
 )
-from tests.unit.application.validation.fakes import FakeEmailSyntaxChecker
+from ..validation.fakes import FakeEmailSyntaxChecker
 
 from csv_data_cleaner.application.dates import DateParser
 from csv_data_cleaner.application.deduplication import (
