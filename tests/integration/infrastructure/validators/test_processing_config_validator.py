@@ -3,16 +3,32 @@
 import pytest
 
 from csv_data_cleaner.domain.errors import ConfigurationError
+from csv_data_cleaner.infrastructure.validators.config_field_validator import ConfigFieldValidator
 from csv_data_cleaner.infrastructure.validators.processing_config_validator import (
     ProcessingConfigValidator,
 )
 
 
+def build_validator() -> ProcessingConfigValidator:
+    return ProcessingConfigValidator(field_validator=ConfigFieldValidator())
+
+
 def test_validator_builds_typed_configuration_data() -> None:
-    result = ProcessingConfigValidator().validate(
+    result = build_validator().validate(
         {
             "required_columns": ["email"],
-            "validation": {"email_columns": ["email"], "date_columns": []},
+            "validation": {
+                "email_columns": ["email"],
+                "date_columns": ["signup_date"],
+                "date_formats": {
+                    "signup_date": ["%Y-%m-%d", "%d/%m/%Y"],
+                },
+            },
+            "normalization": {
+                "trim_whitespace": True,
+                "empty_strings_as_null": True,
+                "date_output_format": "%Y-%m-%d",
+            },
             "deduplication": {"columns": ["email"], "keep": "last"},
             "sorting": [{"column": "email", "ascending": False}],
             "output": {"format": "xlsx"},
@@ -20,10 +36,28 @@ def test_validator_builds_typed_configuration_data() -> None:
     )
 
     assert result.required_columns == ("email",)
+    assert result.date_rules[0].column == "signup_date"
+    assert result.date_rules[0].formats == ("%Y-%m-%d", "%d/%m/%Y")
+    assert result.normalization.trim_whitespace is True
+    assert result.normalization.empty_strings_as_null is True
+    assert result.normalization.date_output_format == "%Y-%m-%d"
     assert result.deduplication is not None
     assert result.deduplication.keep == "last"
     assert result.sorting[0].ascending is False
     assert result.output_format == "xlsx"
+
+
+def test_validator_uses_deterministic_stage_2_defaults() -> None:
+    result = build_validator().validate(
+        {
+            "validation": {"date_columns": ["created_at"]},
+        }
+    )
+
+    assert result.date_rules[0].formats == ("%Y-%m-%d",)
+    assert result.normalization.trim_whitespace is True
+    assert result.normalization.empty_strings_as_null is True
+    assert result.normalization.date_output_format == "%Y-%m-%d"
 
 
 @pytest.mark.parametrize(
@@ -31,6 +65,23 @@ def test_validator_builds_typed_configuration_data() -> None:
     [
         {"required_columns": "email"},
         {"validation": []},
+        {"validation": {"date_formats": []}},
+        {
+            "validation": {
+                "date_columns": ["created_at"],
+                "date_formats": {"created_at": []},
+            }
+        },
+        {
+            "validation": {
+                "date_columns": ["created_at"],
+                "date_formats": {"other_date": ["%Y-%m-%d"]},
+            }
+        },
+        {"normalization": []},
+        {"normalization": {"trim_whitespace": "yes"}},
+        {"normalization": {"empty_strings_as_null": "yes"}},
+        {"normalization": {"date_output_format": ""}},
         {"deduplication": {"columns": "email"}},
         {"deduplication": {"keep": "middle"}},
         {"sorting": ["email"]},
@@ -41,4 +92,4 @@ def test_validator_builds_typed_configuration_data() -> None:
 )
 def test_validator_rejects_invalid_schema(config: dict[str, object]) -> None:
     with pytest.raises(ConfigurationError):
-        ProcessingConfigValidator().validate(config)  # type: ignore[arg-type]
+        build_validator().validate(config)  # type: ignore[arg-type]
