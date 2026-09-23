@@ -21,3 +21,10 @@ def test_validator_rejects_empty_headers(header: list[object]) -> None:
 
     with pytest.raises(InputDataError, match="non-empty column headers"):
         DataFrameHeaderValidator().validate(frame)
+
+
+def test_validator_rejects_duplicate_headers() -> None:
+    frame = pd.DataFrame([["email", "email"], ["first@example.com", "second@example.com"]])
+
+    with pytest.raises(InputDataError, match="duplicate column headers: email"):
+        DataFrameHeaderValidator().validate(frame)
