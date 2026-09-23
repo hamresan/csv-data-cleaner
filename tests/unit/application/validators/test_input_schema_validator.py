@@ -27,6 +27,7 @@ def build_config(
         ),
         normalization=NormalizationPolicy(),
         deduplication=None,
+        filters=(),
         sorting=(),
         output_format=OutputFormat.CSV,
     )
