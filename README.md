@@ -67,6 +67,8 @@ validation:
 normalization:
   trim_whitespace: true
   empty_strings_as_null: true
+  casefold_columns:
+    - email
   date_output_format: "%Y-%m-%d"
 
 deduplication:
@@ -126,6 +128,7 @@ Rules are intentionally configurable, so the same tool can support different dat
 | `validation.date_formats` | Accepted input formats for configured date columns; defaults to `%Y-%m-%d` |
 | `normalization.trim_whitespace` | Trim leading/trailing whitespace from strings; defaults to `true` |
 | `normalization.empty_strings_as_null` | Convert empty normalized strings to null; defaults to `true` |
+| `normalization.casefold_columns` | Columns whose string values are case-normalized with Unicode-aware case folding; defaults to an empty list |
 | `normalization.date_output_format` | Canonical date representation; defaults to `%Y-%m-%d` |
 | `deduplication.columns` | One or more columns used to identify duplicates |
 | `deduplication.keep` | Which duplicate to keep: `first` or `last` |
@@ -133,6 +136,14 @@ Rules are intentionally configurable, so the same tool can support different dat
 | `output.format` | Output format: `csv` or `xlsx` |
 
 A missing required **value** makes a row invalid. A missing required **column** stops processing with a clear configuration error.
+
+### Deduplication behavior
+
+Deduplication runs after normalization and validation and compares the normalized values of all configured key columns. Composite keys require every configured key value to match. `keep: first` retains the first matching row in source order, while `keep: last` retains the last.
+
+Missing key values participate in the duplicate key. This means two rows with the same normalized key, including `null` in the same key positions, are duplicates. For example, when `email` is the only duplicate key, two rows whose normalized `email` is `null` belong to the same duplicate group.
+
+Validation status does not exclude a row from duplicate detection. If duplicate rows are also validation-invalid, dropped rows are classified as duplicates and kept separately for duplicate review rather than being counted again among retained invalid rows. Their original source values and validation issues remain available in the processing result.
 
 ## Command reference
 

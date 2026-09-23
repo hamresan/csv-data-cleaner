@@ -84,6 +84,35 @@ def test_processor_validates_source_then_returns_normalized_row() -> None:
     assert source.values["name"] == "  مهران  "
 
 
+def test_processor_applies_configured_case_normalization_and_preserves_source() -> None:
+    config = build_config()
+    config = ProcessingConfig(
+        required_columns=config.required_columns,
+        email_columns=config.email_columns,
+        date_rules=config.date_rules,
+        normalization=NormalizationPolicy(casefold_columns=("email",)),
+        deduplication=config.deduplication,
+        sorting=config.sorting,
+        output_format=config.output_format,
+    )
+    source = DataRow(
+        number=3,
+        values={
+            "name": "  Ada Lovelace  ",
+            "email": "  USER@EXAMPLE.COM  ",
+            "created_at": "2026-09-23",
+        },
+    )
+
+    result = build_processor().process(source, config)
+
+    assert result.is_valid is True
+    assert result.normalized_row.values["name"] == "Ada Lovelace"
+    assert result.normalized_row.values["email"] == "user@example.com"
+    assert result.source_row is source
+    assert source.values["email"] == "  USER@EXAMPLE.COM  "
+
+
 def test_processor_returns_all_issues_with_original_invalid_row() -> None:
     source = DataRow(
         number=11,

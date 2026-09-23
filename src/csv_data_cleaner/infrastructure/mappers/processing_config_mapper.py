@@ -33,6 +33,7 @@ class ProcessingConfigMapper:
             normalization=NormalizationPolicy(
                 trim_whitespace=data.normalization.trim_whitespace,
                 empty_strings_as_null=data.normalization.empty_strings_as_null,
+                casefold_columns=data.normalization.casefold_columns,
                 date_output_format=data.normalization.date_output_format,
             ),
             deduplication=deduplication,

@@ -57,7 +57,7 @@ class ProcessingConfigValidator:
         deduplication_data = None
         if deduplication is not None:
             deduplication_data = DeduplicationConfigData(
-                columns=fields.strings(
+                columns=fields.non_empty_strings(
                     deduplication.get("columns", []),
                     "deduplication.columns",
                 ),
@@ -86,6 +86,10 @@ class ProcessingConfigValidator:
                 empty_strings_as_null=fields.boolean(
                     normalization.get("empty_strings_as_null", True),
                     "normalization.empty_strings_as_null",
+                ),
+                casefold_columns=fields.strings(
+                    normalization.get("casefold_columns", []),
+                    "normalization.casefold_columns",
                 ),
                 date_output_format=fields.required_string(
                     normalization.get("date_output_format", "%Y-%m-%d"),

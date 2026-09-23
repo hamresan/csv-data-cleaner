@@ -31,3 +31,11 @@ def test_normalizer_respects_disabled_string_rules() -> None:
     )
 
     assert StringValueNormalizer().normalize("  ", policy) == "  "
+
+
+def test_normalizer_casefolds_only_when_requested() -> None:
+    normalizer = StringValueNormalizer()
+    policy = NormalizationPolicy()
+
+    assert normalizer.normalize("  Ada@Example.COM  ", policy, casefold=True) == "ada@example.com"
+    assert normalizer.normalize("  Ada Lovelace  ", policy) == "Ada Lovelace"

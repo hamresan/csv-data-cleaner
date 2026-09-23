@@ -48,6 +48,7 @@ class NormalizationPolicy:
 
     trim_whitespace: bool = True
     empty_strings_as_null: bool = True
+    casefold_columns: tuple[str, ...] = ()
     date_output_format: str = "%Y-%m-%d"
 
 

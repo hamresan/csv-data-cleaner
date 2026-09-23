@@ -20,6 +20,7 @@ from csv_data_cleaner.infrastructure.validators.processing_config_validator impo
 CONFIG = {
     "required_columns": ["name", "email"],
     "validation": {"email_columns": ["email"], "date_columns": []},
+    "normalization": {"casefold_columns": ["email"]},
     "deduplication": {"columns": ["email"], "keep": "last"},
     "sorting": [{"column": "name", "ascending": True}],
     "output": {"format": "xlsx"},
@@ -46,6 +47,7 @@ def test_supported_config_formats_map_to_same_domain_config(tmp_path: Path, suff
     config = build_loader().load(path)
 
     assert config.required_columns == ("name", "email")
+    assert config.normalization.casefold_columns == ("email",)
     assert config.deduplication is not None
     assert config.deduplication.keep is DeduplicationKeep.LAST
     assert config.output_format is OutputFormat.XLSX

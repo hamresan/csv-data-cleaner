@@ -27,6 +27,7 @@ def test_validator_builds_typed_configuration_data() -> None:
             "normalization": {
                 "trim_whitespace": True,
                 "empty_strings_as_null": True,
+                "casefold_columns": ["email"],
                 "date_output_format": "%Y-%m-%d",
             },
             "deduplication": {"columns": ["email"], "keep": "last"},
@@ -40,6 +41,7 @@ def test_validator_builds_typed_configuration_data() -> None:
     assert result.date_rules[0].formats == ("%Y-%m-%d", "%d/%m/%Y")
     assert result.normalization.trim_whitespace is True
     assert result.normalization.empty_strings_as_null is True
+    assert result.normalization.casefold_columns == ("email",)
     assert result.normalization.date_output_format == "%Y-%m-%d"
     assert result.deduplication is not None
     assert result.deduplication.keep == "last"
@@ -57,6 +59,7 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
     assert result.date_rules[0].formats == ("%Y-%m-%d",)
     assert result.normalization.trim_whitespace is True
     assert result.normalization.empty_strings_as_null is True
+    assert result.normalization.casefold_columns == ()
     assert result.normalization.date_output_format == "%Y-%m-%d"
 
 
@@ -81,8 +84,11 @@ def test_validator_uses_deterministic_stage_2_defaults() -> None:
         {"normalization": []},
         {"normalization": {"trim_whitespace": "yes"}},
         {"normalization": {"empty_strings_as_null": "yes"}},
+        {"normalization": {"casefold_columns": "email"}},
+        {"normalization": {"casefold_columns": [""]}},
         {"normalization": {"date_output_format": ""}},
         {"deduplication": {"columns": "email"}},
+        {"deduplication": {"columns": []}},
         {"deduplication": {"keep": "middle"}},
         {"sorting": ["email"]},
         {"sorting": [{"column": ""}]},
