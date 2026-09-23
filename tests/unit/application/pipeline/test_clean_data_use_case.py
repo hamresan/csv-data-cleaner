@@ -2,14 +2,6 @@
 
 from pathlib import Path
 
-from .fakes import (
-    FakeConfigLoader,
-    FakeExporter,
-    FakeInputReader,
-    FakeReportCalculator,
-)
-from ..validation.fakes import FakeEmailSyntaxChecker
-
 from csv_data_cleaner.application.dates import DateParser
 from csv_data_cleaner.application.deduplication import (
     DeduplicationSchemaValidator,
@@ -49,6 +41,14 @@ from csv_data_cleaner.domain import (
     ProcessingConfig,
     ProcessingSummary,
     SortRule,
+)
+
+from ..validation.fakes import FakeEmailSyntaxChecker
+from .fakes import (
+    FakeConfigLoader,
+    FakeExporter,
+    FakeInputReader,
+    FakeReportCalculator,
 )
 
 
