@@ -32,7 +32,10 @@ def test_validator_builds_typed_configuration_data() -> None:
                 "date_output_format": "%Y-%m-%d",
             },
             "deduplication": {"columns": ["email"], "keep": "last"},
-            "filters": [\n                {"column": "email", "operator": "not_equals", "value": None},\n                {"column": "score", "operator": "equals", "value": 10.5},\n            ],
+            "filters": [
+                {"column": "email", "operator": "not_equals", "value": None},
+                {"column": "score", "operator": "equals", "value": 10.5},
+            ],
             "sorting": [{"column": "email", "ascending": False}],
             "output": {"format": "xlsx"},
         }
@@ -47,7 +50,8 @@ def test_validator_builds_typed_configuration_data() -> None:
     assert result.normalization.date_output_format == "%Y-%m-%d"
     assert result.deduplication is not None
     assert result.deduplication.keep == "last"
-    assert result.filters[0].operator == "not_equals"\n    assert result.filters[1].value == 10.5
+    assert result.filters[0].operator == "not_equals"
+    assert result.filters[1].value == 10.5
     assert result.sorting[0].ascending is False
     assert result.output_format == "xlsx"
 
