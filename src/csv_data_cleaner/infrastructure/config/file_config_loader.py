@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import TypeAlias
 
 import yaml
 
@@ -16,21 +16,26 @@ from csv_data_cleaner.domain import (
 )
 from csv_data_cleaner.domain.errors import ConfigurationError
 
+ConfigValue: TypeAlias = (
+    str | bool | None | list["ConfigValue"] | dict[str, "ConfigValue"]
+)
+ConfigObject: TypeAlias = dict[str, ConfigValue]
+
 
 class FileConfigLoader(ConfigLoader):
     """Load supported config files and map them to validated domain configuration."""
 
     def load(self, path: Path) -> ProcessingConfig:
-        raw = self._read(path)
-        return self._map(raw)
+        data = self._read(path)
+        return self._map(data)
 
-    def _read(self, path: Path) -> dict[str, Any]:
+    def _read(self, path: Path) -> ConfigObject:
         if not path.is_file():
             raise ConfigurationError(f"Configuration file does not exist: {path}")
 
         try:
             if path.suffix.lower() == ".json":
-                data = json.loads(path.read_text(encoding="utf-8"))
+                data: object = json.loads(path.read_text(encoding="utf-8"))
             elif path.suffix.lower() in {".yaml", ".yml"}:
                 data = yaml.safe_load(path.read_text(encoding="utf-8"))
             else:
@@ -38,75 +43,138 @@ class FileConfigLoader(ConfigLoader):
         except (OSError, json.JSONDecodeError, yaml.YAMLError) as error:
             raise ConfigurationError(f"Could not read configuration: {path}") from error
 
-        if not isinstance(data, dict):
-            raise ConfigurationError("Configuration root must be an object.")
-        return data
+        return self._config_object(data, "Configuration root")
 
-    def _map(self, data: dict[str, Any]) -> ProcessingConfig:
-        try:
-            validation = data.get("validation", {})
-            output = data.get("output", {})
-            deduplication = data.get("deduplication")
-            sorting = data.get("sorting", [])
+    def _map(self, data: ConfigObject) -> ProcessingConfig:
+        validation = self._optional_object(data.get("validation"), "validation")
+        output = self._optional_object(data.get("output"), "output")
+        deduplication = self._optional_object(
+            data.get("deduplication"), "deduplication", allow_none=True
+        )
+        sorting = self._objects(data.get("sorting", []), "sorting")
 
-            if not isinstance(validation, dict) or not isinstance(output, dict):
-                raise TypeError
-            if not isinstance(sorting, list):
-                raise TypeError
+        policy = None
+        if deduplication is not None:
+            policy = DeduplicationPolicy(
+                columns=self._strings(
+                    deduplication.get("columns", []),
+                    "deduplication.columns",
+                ),
+                keep=self._deduplication_keep(deduplication.get("keep", "first")),
+            )
 
-            deduplication_policy = None
-            if deduplication is not None:
-                if not isinstance(deduplication, dict):
-                    raise TypeError
-                deduplication_policy = DeduplicationPolicy(
-                    columns=self._strings(deduplication.get("columns", []), "deduplication.columns"),
-                    keep=DeduplicationKeep(deduplication.get("keep", "first")),
-                )
-
-            sort_rules = tuple(
+        return ProcessingConfig(
+            required_columns=self._strings(
+                data.get("required_columns", []),
+                "required_columns",
+            ),
+            email_columns=self._strings(
+                validation.get("email_columns", []),
+                "validation.email_columns",
+            ),
+            date_columns=self._strings(
+                validation.get("date_columns", []),
+                "validation.date_columns",
+            ),
+            deduplication=policy,
+            sorting=tuple(
                 SortRule(
-                    column=self._required_string(item, "sorting.column"),
+                    column=self._sort_column(item),
                     ascending=self._boolean(item.get("ascending", True), "sorting.ascending"),
                 )
-                for item in self._objects(sorting, "sorting")
-            )
-
-            return ProcessingConfig(
-                required_columns=self._strings(data.get("required_columns", []), "required_columns"),
-                email_columns=self._strings(
-                    validation.get("email_columns", []), "validation.email_columns"
-                ),
-                date_columns=self._strings(
-                    validation.get("date_columns", []), "validation.date_columns"
-                ),
-                deduplication=deduplication_policy,
-                sorting=sort_rules,
-                output_format=OutputFormat(output.get("format", "csv")),
-            )
-        except (KeyError, TypeError, ValueError) as error:
-            raise ConfigurationError("Configuration contains invalid values.") from error
+                for item in sorting
+            ),
+            output_format=self._output_format(output.get("format", "csv")),
+        )
 
     @staticmethod
-    def _strings(value: Any, field: str) -> tuple[str, ...]:
-        if not isinstance(value, list) or any(not isinstance(item, str) or not item for item in value):
+    def _config_object(value: object, field: str) -> ConfigObject:
+        if not isinstance(value, dict):
+            raise ConfigurationError(f"{field} must be an object.")
+
+        result: ConfigObject = {}
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise ConfigurationError(f"{field} keys must be strings.")
+            result[key] = FileConfigLoader._config_value(item, field)
+        return result
+
+    @staticmethod
+    def _config_value(value: object, field: str) -> ConfigValue:
+        if value is None or isinstance(value, str | bool):
+            return value
+        if isinstance(value, list):
+            return [FileConfigLoader._config_value(item, field) for item in value]
+        if isinstance(value, dict):
+            return FileConfigLoader._config_object(value, field)
+        raise ConfigurationError(f"{field} contains an unsupported value.")
+
+    @staticmethod
+    def _optional_object(
+        value: ConfigValue,
+        field: str,
+        *,
+        allow_none: bool = False,
+    ) -> ConfigObject | None:
+        if value is None:
+            if allow_none:
+                return None
+            return {}
+        if not isinstance(value, dict):
+            raise ConfigurationError(f"{field} must be an object.")
+        return value
+
+    @staticmethod
+    def _strings(value: ConfigValue, field: str) -> tuple[str, ...]:
+        if not isinstance(value, list):
             raise ConfigurationError(f"{field} must be a list of non-empty strings.")
-        return tuple(value)
+
+        result: list[str] = []
+        for item in value:
+            if not isinstance(item, str) or not item:
+                raise ConfigurationError(f"{field} must be a list of non-empty strings.")
+            result.append(item)
+        return tuple(result)
 
     @staticmethod
-    def _objects(value: list[Any], field: str) -> tuple[dict[str, Any], ...]:
-        if any(not isinstance(item, dict) for item in value):
-            raise ConfigurationError(f"{field} must contain objects.")
-        return tuple(value)
+    def _objects(value: ConfigValue, field: str) -> tuple[ConfigObject, ...]:
+        if not isinstance(value, list):
+            raise ConfigurationError(f"{field} must be a list.")
+
+        result: list[ConfigObject] = []
+        for item in value:
+            if not isinstance(item, dict):
+                raise ConfigurationError(f"{field} must contain objects.")
+            result.append(item)
+        return tuple(result)
 
     @staticmethod
-    def _required_string(value: dict[str, Any], field: str) -> str:
-        item = value.get("column")
-        if not isinstance(item, str) or not item:
-            raise ConfigurationError(f"{field} must be a non-empty string.")
-        return item
+    def _sort_column(value: ConfigObject) -> str:
+        column = value.get("column")
+        if not isinstance(column, str) or not column:
+            raise ConfigurationError("sorting.column must be a non-empty string.")
+        return column
 
     @staticmethod
-    def _boolean(value: Any, field: str) -> bool:
+    def _boolean(value: ConfigValue, field: str) -> bool:
         if not isinstance(value, bool):
             raise ConfigurationError(f"{field} must be a boolean.")
         return value
+
+    @staticmethod
+    def _deduplication_keep(value: ConfigValue) -> DeduplicationKeep:
+        if not isinstance(value, str):
+            raise ConfigurationError("deduplication.keep must be first or last.")
+        try:
+            return DeduplicationKeep(value)
+        except ValueError as error:
+            raise ConfigurationError("deduplication.keep must be first or last.") from error
+
+    @staticmethod
+    def _output_format(value: ConfigValue) -> OutputFormat:
+        if not isinstance(value, str):
+            raise ConfigurationError("output.format must be csv or xlsx.")
+        try:
+            return OutputFormat(value)
+        except ValueError as error:
+            raise ConfigurationError("output.format must be csv or xlsx.") from error
