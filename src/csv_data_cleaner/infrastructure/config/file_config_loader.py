@@ -5,9 +5,9 @@ from pathlib import Path
 from csv_data_cleaner.application.ports import ConfigLoader
 from csv_data_cleaner.domain import ProcessingConfig
 from csv_data_cleaner.domain.errors import ConfigurationError
-from csv_data_cleaner.infrastructure.config.mapper import ProcessingConfigMapper
-from csv_data_cleaner.infrastructure.config.parser_factory import ConfigParserFactory
-from csv_data_cleaner.infrastructure.config.value_parser import ConfigValueParser
+from csv_data_cleaner.infrastructure.mappers.processing_config_mapper import ProcessingConfigMapper
+from csv_data_cleaner.infrastructure.factories.config_parser_factory import ConfigParserFactory
+from csv_data_cleaner.infrastructure.validators.config_value_validator import ConfigValueValidator
 
 
 class FileConfigLoader(ConfigLoader):
@@ -16,11 +16,11 @@ class FileConfigLoader(ConfigLoader):
     def __init__(
         self,
         parser_factory: ConfigParserFactory,
-        value_parser: ConfigValueParser,
+        value_validator: ConfigValueValidator,
         mapper: ProcessingConfigMapper,
     ) -> None:
         self.parser_factory = parser_factory
-        self.value_parser = value_parser
+        self.value_validator = value_validator
         self.mapper = mapper
 
     def load(self, path: Path) -> ProcessingConfig:
@@ -29,5 +29,5 @@ class FileConfigLoader(ConfigLoader):
 
         parser = self.parser_factory.create(path)
         parsed = parser.parse(path)
-        config = self.value_parser.parse_object(parsed)
+        config = self.value_validator.parse_object(parsed)
         return self.mapper.map(config)
