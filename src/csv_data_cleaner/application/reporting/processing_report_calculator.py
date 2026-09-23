@@ -17,7 +17,9 @@ class ProcessingReportCalculator(ReportCalculator):
     ) -> ProcessingSummary:
         return ProcessingSummary(
             input_file=input_path.name,
-            processed_records=len(result.rows) + len(result.filtered_rows) + len(result.duplicate_rows),
+            processed_records=len(result.rows)
+            + len(result.filtered_rows)
+            + len(result.duplicate_rows),
             valid_records=len(result.all_valid_rows),
             invalid_records=len(result.all_invalid_rows),
             duplicate_records=len(result.duplicate_rows),

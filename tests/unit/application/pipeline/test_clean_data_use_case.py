@@ -134,8 +134,6 @@ def test_use_case_coordinates_pipeline_boundaries() -> None:
     assert config_loader.calls == [Path("rules.yaml")]
     assert input_reader.calls == [(Path("input.csv"), "Customers")]
     assert exporter.calls == [(result.processing_result, config, Path("output"))]
-    assert report_calculator.calls == [
-        (Path("input.csv"), result.processing_result, output_file)
-    ]
+    assert report_calculator.calls == [(Path("input.csv"), result.processing_result, output_file)]
     assert report_writer.calls == [(summary, Path("output"))]
     assert result.summary == summary
