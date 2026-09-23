@@ -6,6 +6,7 @@ import click
 
 from csv_data_cleaner.application.pipeline import CleanDataRequest
 from csv_data_cleaner.composition_root import build_clean_data_use_case
+from csv_data_cleaner.presentation.error_handler import CliErrorHandler
 
 
 @click.command("clean")
@@ -44,15 +45,14 @@ def clean(
 ) -> None:
     """Clean an input dataset using a processing configuration."""
     use_case = build_clean_data_use_case()
-    result = use_case.execute(
-        CleanDataRequest(
-            input_path=input_path,
-            config_path=config_path,
-            output_dir=output_dir,
-            sheet=sheet,
-            dry_run=dry_run,
-        )
+    request = CleanDataRequest(
+        input_path=input_path,
+        config_path=config_path,
+        output_dir=output_dir,
+        sheet=sheet,
+        dry_run=dry_run,
     )
+    result = CliErrorHandler().run(lambda: use_case.execute(request))
     summary = result.summary
     click.echo(f"Processed records: {summary.processed_records}")
     click.echo(f"Valid records: {summary.valid_records}")
