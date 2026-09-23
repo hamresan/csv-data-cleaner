@@ -54,7 +54,7 @@ def active_sheet(workbook: Workbook) -> Worksheet:
 def write_inputs(tmp_path: Path) -> tuple[Path, Path]:
     rows = [
         ["name", "email", "country"],
-        ["Ada", " ada@example.com ", "UK"],
+        ["Ada", " Ada@Example.COM ", "UK"],
         ["Grace", "grace@example.com", "US"],
         ["Ada duplicate", "ada@example.com", "UK"],
         ["Missing one", "", "OM"],
@@ -109,7 +109,7 @@ def build_config(keep: DeduplicationKeep) -> ProcessingConfig:
         required_columns=("name",),
         email_columns=(),
         date_rules=(),
-        normalization=NormalizationPolicy(),
+        normalization=NormalizationPolicy(casefold_columns=("email",)),
         deduplication=DeduplicationPolicy(
             columns=("email", "country"),
             keep=keep,
