@@ -24,12 +24,13 @@ class PandasInputReader(InputReader):
         suffix = path.suffix.lower()
         try:
             if suffix == ".csv":
-                frame = pd.read_csv(path, dtype=object)
+                frame = pd.read_csv(path, dtype=object, header=None)
             elif suffix == ".xlsx":
                 frame: DataFrame = pd.read_excel(  # pyright: ignore[reportUnknownMemberType]
                     path,
                     sheet_name=sheet or 0,
                     dtype=object,
+                    header=None,
                 )
             else:
                 raise InputDataError(f"Unsupported input format: {suffix}")
