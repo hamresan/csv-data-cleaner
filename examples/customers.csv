@@ -1,0 +1,6 @@
+name,email,signup_date,country
+ Ada Lovelace ,ADA@EXAMPLE.COM,2026-01-15,OM
+Grace Hopper,grace@example.com,15/02/2026,OM
+Ada Lovelace,ada@example.com,2026-01-15,OM
+Invalid Email,not-an-email,2026-03-01,OM
+Out of Scope,out@example.com,2026-04-01,AE

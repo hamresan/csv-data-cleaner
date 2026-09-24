@@ -1,32 +1,27 @@
 # CSV Data Cleaner
 
-A configurable command-line tool for cleaning, validating, deduplicating, and reporting on CSV and Excel data.
+[![Checks](https://github.com/hamresan/csv-data-cleaner/actions/workflows/checks.yml/badge.svg)](https://github.com/hamresan/csv-data-cleaner/actions/workflows/checks.yml)
 
-> **Status:** Under active development toward version `0.1.0`. The documented `clean` command, CSV/XLSX processing pipeline, exports, reporting, dry-run behavior, and expected CLI error handling are implemented and covered by automated tests.
+A configurable local command-line tool for cleaning, validating, deduplicating, filtering, sorting, exporting, and reporting on CSV and Excel data.
 
-## Why this project?
+## Features
 
-Business data often arrives as a spreadsheet that contains missing values, invalid emails or dates, inconsistent records, and duplicates. Cleaning it manually is repetitive and hard to reproduce.
+- Read `.csv` and `.xlsx` input files.
+- Validate required values, email addresses, and configurable date formats.
+- Normalize whitespace, empty strings, selected string columns, and dates.
+- Remove duplicates using one or more columns with `first` or `last` retention.
+- Preserve original invalid and duplicate rows in review exports.
+- Apply ordered inclusion/exclusion filters and stable multi-column sorting.
+- Export cleaned data as CSV or XLSX.
+- Produce a deterministic JSON processing report.
+- Preview processing with `--dry-run` without writing output files.
+- Return concise CLI errors for expected input, configuration, and output failures.
 
-CSV Data Cleaner turns that work into a repeatable command:
+The processing pipeline is:
 
 ```text
-input CSV/XLSX → validate → clean → deduplicate → filter/sort → export → report
+read -> normalize/validate -> deduplicate -> filter -> sort -> export/report
 ```
-
-It is designed for developers, analysts, and small teams that need a local, scriptable data-cleaning workflow without a database, web server, or UI.
-
-## Planned features
-
-- Read `.csv` and `.xlsx` input files
-- Validate required fields, email addresses, dates, and configurable custom rules
-- Remove duplicate records using one or more columns
-- Separate invalid and duplicate rows for review
-- Apply configurable filtering and sorting
-- Export cleaned data as CSV or Excel
-- Produce a JSON summary of total, valid, invalid, and duplicate records
-- Return clear command-line errors for invalid files and configurations
-- Keep rules in a YAML or JSON file instead of hard-coding them
 
 ## Requirements
 
@@ -35,131 +30,92 @@ It is designed for developers, analysts, and small teams that need a local, scri
 
 ## Installation
 
-Clone the repository and install the development environment:
-
 ```bash
 git clone https://github.com/hamresan/csv-data-cleaner.git
 cd csv-data-cleaner
-uv sync
+uv sync --locked
 ```
 
 ## Quick start
 
-Create a rules file:
-
-```yaml
-# rules.yaml
-required_columns:
-  - name
-  - email
-  - signup_date
-
-validation:
-  email_columns:
-    - email
-  date_columns:
-    - signup_date
-  date_formats:
-    signup_date:
-      - "%Y-%m-%d"
-      - "%d/%m/%Y"
-
-normalization:
-  trim_whitespace: true
-  empty_strings_as_null: true
-  casefold_columns:
-    - email
-  date_output_format: "%Y-%m-%d"
-
-deduplication:
-  columns:
-    - email
-  keep: first
-
-filters:
-  - column: country
-    operator: equals
-    value: OM
-    include: true
-
-sorting:
-  - column: name
-    ascending: true
-
-output:
-  format: xlsx
-```
-
-Run the cleaner:
+The repository includes a complete runnable example:
 
 ```bash
 uv run csv-data-cleaner clean \
-  --input examples/customers.xlsx \
-  --config rules.yaml \
+  --input examples/customers.csv \
+  --config examples/rules.yaml \
   --output-dir output
 ```
 
-The command will create:
+Expected terminal output:
+
+```text
+Processed records: 5
+Valid records: 3
+Invalid records: 1
+Duplicate records: 1
+Exported records: 2
+Output file: output/cleaned.csv
+Report file: output/report.json
+```
+
+The command creates:
 
 ```text
 output/
-├── cleaned.xlsx       # valid, cleaned, deduplicated records
-├── invalid_rows.csv   # rows that did not pass validation
-├── duplicate_rows.csv # rows removed as duplicates
-└── report.json        # processing summary
+├── cleaned.csv
+├── invalid_rows.csv
+├── duplicate_rows.csv
+└── report.json
 ```
 
-Example `report.json`:
-
-```json
-{
-  "input_file": "customers.xlsx",
-  "processed_records": 1200,
-  "valid_records": 1087,
-  "invalid_records": 73,
-  "duplicate_records": 40,
-  "exported_records": 1087,
-  "output_file": "output/cleaned.xlsx"
-}
-```
+Reference outputs are committed under `examples/expected/` so the example result can be inspected without running the command.
 
 ## Configuration
 
-Rules are intentionally configurable, so the same tool can support different datasets.
+Configuration files may be YAML or JSON. The supported configuration surface is:
 
-| Setting | Purpose |
-| --- | --- |
-| `required_columns` | Columns that must exist in the input file |
-| `validation.email_columns` | Columns that must contain valid email addresses |
-| `validation.date_columns` | Columns that must contain valid dates |
-| `validation.date_formats` | Accepted input formats for configured date columns; defaults to `%Y-%m-%d` |
-| `normalization.trim_whitespace` | Trim leading/trailing whitespace from strings; defaults to `true` |
-| `normalization.empty_strings_as_null` | Convert empty normalized strings to null; defaults to `true` |
-| `normalization.casefold_columns` | Columns whose string values are case-normalized with Unicode-aware case folding; defaults to an empty list |
-| `normalization.date_output_format` | Canonical date representation; defaults to `%Y-%m-%d` |
-| `deduplication.columns` | One or more columns used to identify duplicates |
-| `deduplication.keep` | Which duplicate to keep: `first` or `last` |
-| `filters` | Ordered inclusion/exclusion filters using `equals` or `not_equals` |
-| `sorting` | Ordered list of output sorting rules |
-| `output.format` | Output format: `csv` or `xlsx` |
+| Setting | Accepted value | Default |
+| --- | --- | --- |
+| `required_columns` | List of column names | `[]` |
+| `validation.email_columns` | List of column names | `[]` |
+| `validation.date_columns` | List of column names | `[]` |
+| `validation.date_formats.<column>` | Non-empty list of `strptime` formats | `["%Y-%m-%d"]` |
+| `normalization.trim_whitespace` | Boolean | `true` |
+| `normalization.empty_strings_as_null` | Boolean | `true` |
+| `normalization.casefold_columns` | List of column names | `[]` |
+| `normalization.date_output_format` | Non-empty `strftime` format string | `"%Y-%m-%d"` |
+| `deduplication.columns` | Non-empty list of column names | Deduplication disabled when section is omitted |
+| `deduplication.keep` | `first` or `last` | `first` |
+| `filters[].column` | Column name | Required per filter |
+| `filters[].operator` | `equals` or `not_equals` | `equals` |
+| `filters[].value` | Scalar: string, number, boolean, or null | `null` when omitted |
+| `filters[].include` | Boolean | `true` |
+| `sorting[].column` | Column name | Required per sort rule |
+| `sorting[].ascending` | Boolean | `true` |
+| `output.format` | `csv` or `xlsx` | `csv` |
 
-A missing required **value** makes a row invalid. A missing required **column** stops processing with a clear configuration error.
+A complete configuration is available at `examples/rules.yaml`.
 
-### Deduplication behavior
+A missing required value makes a row invalid. A missing required column stops processing with a configuration error. Date formats may only be declared for columns listed in `validation.date_columns`.
 
-Deduplication runs after normalization and validation and compares the normalized values of all configured key columns. Composite keys require every configured key value to match. `keep: first` retains the first matching row in source order, while `keep: last` retains the last.
+### Deduplication
 
-Missing key values participate in the duplicate key. This means two rows with the same normalized key, including `null` in the same key positions, are duplicates. For example, when `email` is the only duplicate key, two rows whose normalized `email` is `null` belong to the same duplicate group.
+Deduplication runs after normalization and validation. Composite keys require every configured key value to match. Missing key values participate in duplicate keys.
 
-Validation status does not exclude a row from duplicate detection. If duplicate rows are also validation-invalid, dropped rows are classified as duplicates and kept separately for duplicate review rather than being counted again among retained invalid rows. Their original source values and validation issues remain available in the processing result.
+Validation-invalid rows still participate in duplicate detection. A dropped duplicate that is also invalid is classified as a duplicate rather than counted again among retained invalid rows. Review exports preserve original source values.
 
-### Filtering and sorting behavior
+### Filtering and sorting
 
-The Stage 4 pipeline order is explicit: read -> normalize/validate -> deduplicate -> filter -> sort -> export/report. Filters and sorting operate on normalized retained rows after deduplication. Every filter is applied with AND semantics. A filter compares the configured column with a scalar value using `equals` or `not_equals`; `include: true` keeps matching rows while `include: false` excludes matching rows. Sorting rules are applied in their declared priority order and preserve stable source order for ties. Null values sort after non-null values in ascending order. Referencing a missing filter or sorting column stops processing with a clear input error.
+Filters and sorting operate on normalized retained rows after deduplication. Filters use AND semantics. `include: true` retains matches; `include: false` excludes matches.
 
-### Export and reporting behavior
+Sort rules are applied in declared priority order, source order is stable for ties, and null values sort after non-null values in ascending order. Referencing a missing filter or sorting column stops processing.
 
-Stage 5 writes `cleaned.csv` or `cleaned.xlsx` according to `output.format`, plus `invalid_rows.csv`, `duplicate_rows.csv`, and `report.json`. Cleaned output uses normalized valid rows. Review exports preserve original source values. The report is calculated from the pipeline result and includes processed, valid, invalid, duplicate, and exported record counts. Existing output directories are rejected by default so files are never silently overwritten.
+### Export and reporting
+
+`output.format` controls the cleaned artifact only. Review files are always written as `invalid_rows.csv` and `duplicate_rows.csv`; the processing report is always `report.json`.
+
+Existing output directories are rejected rather than overwritten.
 
 ## Command reference
 
@@ -172,48 +128,56 @@ csv-data-cleaner clean
   [--dry-run]
 ```
 
-- `--input`: Source CSV or XLSX file.
-- `--config`: YAML or JSON rule file.
-- `--output-dir`: Directory for generated files.
-- `--sheet`: Optional Excel worksheet name.
-- `--dry-run`: Validate and show the summary without writing output files.
+- `--input`: CSV or XLSX source file.
+- `--config`: YAML or JSON configuration file.
+- `--output-dir`: New directory for generated artifacts.
+- `--sheet`: XLSX worksheet name. The first worksheet is used when omitted.
+- `--dry-run`: Execute processing and print counts without creating output files.
 
-### Dry run
-
-Use `--dry-run` to execute configuration loading, input reading, validation, normalization, deduplication, filtering, sorting, and report calculation without creating the output directory or writing files:
+Example dry run:
 
 ```bash
 uv run csv-data-cleaner clean \
-  --input examples/customers.xlsx \
-  --config rules.yaml \
+  --input examples/customers.csv \
+  --config examples/rules.yaml \
   --output-dir output \
   --dry-run
 ```
 
-Expected input, configuration, and output errors are shown as concise CLI messages with a non-zero exit code and no stack trace by default.
+## Known limitations
+
+- Input formats are limited to CSV and XLSX.
+- Configuration formats are limited to YAML and JSON.
+- XLSX processing targets worksheet cell data; spreadsheet presentation features are not part of the cleaning model.
+- The tool runs locally and does not provide a server, database, web UI, or background service.
+- Output directories must not already exist.
+- CSV/XLSX formula neutralization is not currently performed. See Security before opening generated files in spreadsheet software.
+
+## Security
+
+Treat CSV and XLSX files from untrusted sources as untrusted data.
+
+CSV and spreadsheet applications may interpret cell values beginning with formula-triggering characters as formulas. CSV Data Cleaner currently preserves such cell content rather than neutralizing it, so generated CSV/XLSX files should not be treated as safe merely because they were processed by this tool. Inspect untrusted output before opening it in spreadsheet software, and avoid enabling active content or external links.
+
+The application does not execute spreadsheet formulas itself; its supported workflow reads tabular values through pandas/openpyxl and writes tabular output.
 
 ## Development
 
+Install all development dependencies and run the same quality gate used by CI:
+
 ```bash
-uv sync --all-groups
+uv sync --locked --all-groups
 make check
 ```
 
-The project will use Python 3.12, `pandas`, and `openpyxl` for tabular and Excel handling. Its implementation will keep parsing, validation, deduplication, export, and reporting as separate testable components.
+`make check` runs Ruff linting, Ruff formatting checks, strict Pyright type checking, and pytest with branch coverage.
 
-## Roadmap
+The codebase uses a `src/` layout and separates domain, application, infrastructure, presentation, and composition-root responsibilities.
 
-- [x] Project scaffolding and CLI entry point
-- [ ] CSV and XLSX readers
-- [ ] Configurable validation and deduplication rules
-- [ ] CSV/XLSX exports and JSON report
-- [ ] Example datasets and end-to-end tests
-- [ ] Docker image and GitHub Actions checks
+## Continuous integration
 
-## Contributing
-
-Issues and pull requests are welcome. Before opening a pull request, run the checks in the [Development](#development) section.
+GitHub Actions runs `make check` on pushes to `main` and `stage-*` branches and on pull requests targeting `main`.
 
 ## License
 
-This project will be released under the MIT License.
+Licensed under the MIT License. See `LICENSE`.
